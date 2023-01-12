@@ -1,0 +1,22 @@
+#!/bin/bash
+
+# {{ ansible_managed }}
+
+docker rmi $(docker images -a -q)
+rm -rf {{ tester.path.home }}/.cache/molecule {{ tester.path.home }}/.cache/ansible-compat
+
+test_containers=$(docker ps -a | grep test-ag | cut -d ' ' -f 30)
+test_networks=$(docker network ls | grep test-ag | cut -d ' ' -f4)
+
+for c in ${test_containers[@]}
+do
+  echo "Cleaning container: '$c'"
+  docker stop "$c"
+  docker rm "$c"
+done
+
+for nw in ${test_networks[@]}
+do
+  echo "Cleaning docker network: '$nw'"
+  docker network rm "$nw"
+done

@@ -1,0 +1,13 @@
+# {{ ansible_managed }}
+# ansibleguy.cicd_tester
+
+[Unit]
+Description=Timer to run linting of repository '{{ collection_name }}'
+
+[Timer]
+OnCalendar={{ tester.trigger.collection_lint.day }} {{ trigger_time_lint }}:00
+Persistent=false
+WakeSystem=false
+
+[Install]
+WantedBy=multi-user.target

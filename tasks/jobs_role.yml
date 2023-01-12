@@ -1,0 +1,69 @@
+---
+
+- name: "CICD | Ansible Tester | Role {{ repo_name }} | Adding molecule job"
+  ansible.builtin.template:
+    src: "templates/etc/systemd/system/ansible-test-{{ test }}.{{ item }}.j2"
+    dest: "/etc/systemd/system/ansible-test-{{ test }}-{{ repo_name }}.{{ item }}"
+    owner: 'root'
+    group: "{{ tester.user }}"
+    mode: 0640
+  tags: [services, roles]
+  vars:
+    test: 'molecule'
+  loop:
+    - 'service'
+    - 'timer'
+
+- name: "CICD | Ansible Tester | Role {{ repo_name }} | Adding yamllint job"
+  ansible.builtin.template:
+    src: "templates/etc/systemd/system/ansible-test-{{ test }}.{{ item }}.j2"
+    dest: "/etc/systemd/system/ansible-test-{{ test }}-{{ repo_name }}.{{ item }}"
+    owner: 'root'
+    group: "{{ tester.user }}"
+    mode: 0640
+  vars:
+    test: 'yamllint'
+  tags: [services, roles]
+  loop:
+    - 'service'
+    - 'timer'
+
+- name: "CICD | Ansible Tester | Role {{ repo_name }} | Adding ansible-lint job"
+  ansible.builtin.template:
+    src: "templates/etc/systemd/system/ansible-test-{{ test }}.{{ item }}.j2"
+    dest: "/etc/systemd/system/ansible-test-{{ test }}-{{ repo_name }}.{{ item }}"
+    owner: 'root'
+    group: "{{ tester.user }}"
+    mode: 0640
+  tags: [services, roles]
+  vars:
+    test: 'ansiblelint'
+  loop:
+    - 'service'
+    - 'timer'
+
+- name: "CICD | Ansible Tester | Role {{ repo_name }} | Starting/enabling jobs"
+  ansible.builtin.systemd:
+    daemon_reload: yes
+    name: "{{ item }}"
+    state: started
+    enabled: yes
+  tags: [services, roles]
+  loop:
+    - "ansible-test-molecule-{{ repo_name }}.timer"
+    - "ansible-test-yamllint-{{ repo_name }}.timer"
+    - "ansible-test-ansiblelint-{{ repo_name }}.timer"
+
+- name: "CICD | Ansible Tester | Role {{ repo_name }} | Adding initial badges"
+  ansible.builtin.shell: |
+    source "{{ tester.path.venv }}/bin/activate"
+    anybadge --label="{{ item.label }}" --value="WAITING" --file="{{ repo_name }}.{{ item.ext }}" --color="#{{ tester.colors.wait }}"
+  args:
+    executable: '/bin/bash'
+    chdir: "{{ tester.path.web }}"
+    creates: "{{ tester.path.web }}/{{ repo_name }}.{{ item.ext }}.svg"
+  tags: [roles]
+  loop:
+    - {label: 'YamlLint', ext: 'yamllint'}
+    - {label: 'Ansible-Lint', ext: 'ansiblelint'}
+    - {label: 'Molecule', ext: 'molecule'}

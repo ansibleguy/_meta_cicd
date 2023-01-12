@@ -1,0 +1,22 @@
+# {{ ansible_managed }}
+# ansibleguy.cicd_tester
+
+[Unit]
+Description=Service to run ansible {{ test }} tests of repository '{{ repo_name }}'
+
+[Service]
+Type=oneshot
+User={{ tester.user }}
+Group={{ tester.user }}
+ExecStart=/usr/bin/timeout 3600 /bin/bash {{ tester.path.script }}/{{ test }}.sh '{{ repo_name }}'
+ExecStopPost=/bin/bash -c "if [[ \"$EXIT_STATUS\" != 0 ]];then {{ tester.path.script }}/{{ test }}.sh '{{ repo_name }}' 'FAILED-ENVIRONMENT';fi"
+{% if ansible_distribution_version == '10' %}
+StandardOutput=syslog
+StandardError=syslog
+{% else %}
+StandardOutput=journal
+StandardError=journal
+{% endif %}
+SyslogIdentifier=cicd_{{ test }}_{{ repo_name }}
+
+Environment="DOCKER_HOST={{ tester.docker.url }}"

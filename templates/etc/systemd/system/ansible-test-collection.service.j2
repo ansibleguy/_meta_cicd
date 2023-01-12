@@ -1,0 +1,22 @@
+# {{ ansible_managed }}
+# ansibleguy.cicd_tester
+
+[Unit]
+Description=Service to run tests of collection '{{ collection_name }}'
+
+[Service]
+Type=oneshot
+User={{ tester.user }}
+Group={{ tester.user }}
+ExecStartPre=mkdir -p {{ tester.path.test }}
+ExecStartPre=rm -rf {{ tester.path.test }}/collection_{{ collection_name }}
+ExecStart=/bin/bash {{ tester.path.script }}/collection_test.sh '{{ collection_name }}' '{{ job.value.label }}'{% for arg in job.value.test_args %} '{{ arg }}'{% endfor %}
+
+{% if ansible_distribution_version == '10' %}
+StandardOutput=syslog
+StandardError=syslog
+{% else %}
+StandardOutput=journal
+StandardError=journal
+{% endif %}
+SyslogIdentifier=cicd_collection_{{ collection_name }}

@@ -1,0 +1,13 @@
+# {{ ansible_managed }}
+# ansibleguy.cicd_tester
+
+[Unit]
+Description=Timer to run {{ test }} of repository '{{ repo_name }}'
+
+[Timer]
+OnCalendar={{ tester.trigger.ansiblelint.day }} {{ trigger_time_ansiblelint }}:00
+Persistent=false
+WakeSystem=false
+
+[Install]
+WantedBy=multi-user.target

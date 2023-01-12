@@ -1,0 +1,20 @@
+# {{ ansible_managed }}
+# ansibleguy.cicd_tester
+
+[Unit]
+Description=Service to clean test-resources
+
+[Service]
+Type=oneshot
+ExecStart=/bin/bash {{ tester.path.script_mgmt }}/cleanup.sh
+{% if ansible_distribution_version == '10' %}
+StandardOutput=syslog
+StandardError=syslog
+{% else %}
+StandardOutput=journal
+StandardError=journal
+{% endif %}
+SyslogIdentifier=cicd_cleanup
+TimeoutSec=3600
+
+Environment="DOCKER_HOST='{{ tester.docker.url }}'"

@@ -1,0 +1,15 @@
+# {{ ansible_managed }}
+# ansibleguy.cicd_tester
+
+[Unit]
+Description=Timer to clean test-resources
+
+[Timer]
+OnCalendar={{ tester.docker.cleanup_timer }}
+Persistent=false
+WakeSystem=false
+
+[Install]
+WantedBy=multi-user.target
+
+

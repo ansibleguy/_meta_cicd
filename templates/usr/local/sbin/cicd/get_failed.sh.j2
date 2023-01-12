@@ -1,0 +1,20 @@
+#!/bin/bash
+
+# {{ ansible_managed }}
+
+set -e -o pipefail
+
+echo ''
+echo 'FAILED TESTS:'
+echo ''
+
+if [ -z "$1" ]
+then
+    echo 'Provide a test-type to filter the output!'
+    echo ''
+    systemctl list-units --failed | grep 'tests of' | cut -d ' ' -f2
+else
+    systemctl list-units --failed | grep 'tests of' | cut -d ' ' -f2 | grep "$1"
+fi
+
+echo ''

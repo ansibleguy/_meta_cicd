@@ -1,0 +1,29 @@
+#!/bin/bash
+
+# {{ ansible_managed }}
+
+set -e -o pipefail
+
+echo ''
+
+if [ -z "$1" ] || [ -z "$2" ]
+then
+  echo 'Arguments:'
+  echo '  1: test type'
+  echo '  2: role name'
+  echo ''
+  exit 1
+fi
+
+for FILE in /etc/systemd/system/ansible-test-$1-*$2*.service
+do
+  svc=$(echo $FILE | cut -d '/' -f5)
+  echo "Starting '$svc'"
+  systemctl start "$svc"
+  echo 'Pulling status:'
+  echo ''
+  journalctl -u "$svc" --no-pager -n 25
+  echo "Command: journalctl -u "$svc" --no-pager -n 25"
+done
+
+echo ''

@@ -1,0 +1,49 @@
+---
+
+- name: "CICD | Ansible Tester | Collection {{ collection_name }} | Adding test job"
+  ansible.builtin.template:
+    src: "templates/etc/systemd/system/ansible-test-collection.{{ item }}.j2"
+    dest: "/etc/systemd/system/ansible-test-collection-{{ collection_name }}.{{ item }}"
+    owner: 'root'
+    group: "{{ tester.user }}"
+    mode: 0640
+  tags: [services, collections]
+  loop:
+    - 'service'
+    - 'timer'
+
+- name: "CICD | Ansible Tester | Collection {{ collection_name }} | Adding lint job"
+  ansible.builtin.template:
+    src: "templates/etc/systemd/system/ansible-test-collection-lint.{{ item }}.j2"
+    dest: "/etc/systemd/system/ansible-test-collection-lint-{{ collection_name }}.{{ item }}"
+    owner: 'root'
+    group: "{{ tester.user }}"
+    mode: 0640
+  tags: [services, collections]
+  loop:
+    - 'service'
+    - 'timer'
+
+- name: "CICD | Ansible Tester | Collection {{ collection_name }} | Starting/enabling jobs"
+  ansible.builtin.systemd:
+    daemon_reload: yes
+    name: "{{ item }}"
+    state: started
+    enabled: yes
+  tags: [services, collections]
+  loop:
+    - "ansible-test-collection-lint-{{ collection_name }}.timer"
+    - "ansible-test-collection-{{ collection_name }}.timer"
+
+- name: "CICD | Ansible Tester | Collection {{ collection_name }} | Adding initial badges"
+  ansible.builtin.shell: |
+    source "{{ tester.path.venv }}/bin/activate"
+    anybadge --label="{{ item.label }}" --value="WAITING" --file="{{ item.file }}" --color="#{{ tester.colors.wait }}"
+  args:
+    executable: '/bin/bash'
+    chdir: "{{ tester.path.web }}"
+    creates: "{{ tester.path.web }}/{{ item.file }}.svg"
+  tags: [collections]
+  loop:
+    - {label: 'LINT', file: "{{ collection_name }}.collection.lint"}
+    - {label: "TEST {{ job.value.label }}", file: "{{ collection_name }}.collection.test"}

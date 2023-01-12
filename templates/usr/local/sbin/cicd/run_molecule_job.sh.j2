@@ -1,0 +1,25 @@
+#!/bin/bash
+
+# {{ ansible_managed }}
+
+set -e -o pipefail
+
+echo ''
+
+if [ -z "$1" ]
+then
+  echo 'Arguments:'
+  echo '  1: role name'
+  echo ''
+  exit 1
+fi
+
+for FILE in /etc/systemd/system/ansible-test-molecule-*$1*.service
+do
+  svc=$(echo $FILE | cut -d '/' -f5)
+  echo "Starting '$svc'"
+  systemctl start "$svc" --no-block
+  journalctl -u "$svc" --no-pager -f
+done
+
+echo ''

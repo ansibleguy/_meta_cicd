@@ -1,0 +1,179 @@
+---
+
+- name: CICD | Ansible Tester | Creating service user
+  ansible.builtin.user:
+    name: "{{ tester.user }}"
+    shell: '/bin/bash'
+    comment: 'Serviceuser to run Tests'
+    home: "{{ tester.path.home }}"
+  tags: [base]
+
+- name: CICD | Ansible Tester | Adding tester directories
+  ansible.builtin.file:
+    path: "{{ item }}"
+    state: directory
+    owner: "{{ tester.user }}"
+    group: "{{ tester.user }}"
+    recurse: true
+    mode: 0755
+  loop:
+  - "{{ tester.path.test }}"
+  - "{{ tester.path.web }}"
+  - "{{ tester.path.venv }}"
+  - "{{ tester.path.script }}"
+  - "{{ tester.path.home }}/.secret"
+
+- name: CICD | Ansible Tester | Adding other directories
+  ansible.builtin.file:
+    path: "{{ item }}"
+    state: directory
+    owner: 'root'
+    group: 'root'
+    recurse: true
+    mode: 0755
+  loop:
+  - "{{ tester.path.script_mgmt }}"
+
+- name: CICD | Ansible Tester | Installing packages
+  ansible.builtin.apt:
+    name: "{{ tester.packages.apt }}"
+    state: latest
+
+- name: CICD | Ansible Tester | Installing PIP modules
+  ansible.builtin.pip:
+    name: "{{ tester.packages.pip }}"
+    virtualenv: "{{ tester.path.venv }}"
+    virtualenv_python: "{{ tester.python_version }}"
+    virtualenv_command: '/usr/bin/virtualenv'
+    state: present
+
+- name: CICD | Ansible Tester | Updating venv ownership
+  ansible.builtin.file:
+    path: "{{ tester.path.venv }}"
+    state: directory
+    owner: "{{ tester.user }}"
+    group: "{{ tester.user }}"
+    recurse: true
+
+- name: CICD | Ansible Tester | Installing ansible collections
+  ansible.builtin.shell: "source {{ tester.path.venv }}/bin/activate &&
+  ansible-galaxy collection install {{ item }} -p {{ tester.path.home }}/.ansible/collections"
+  args:
+    executable: '/bin/bash'
+  loop: "{{ tester.packages.ansible_collections }}"
+  changed_when: false
+
+- name: CICD | Ansible Tester | Updating ansible-lib ownership
+  ansible.builtin.file:
+    path: "{{ tester.path.home }}"
+    state: directory
+    owner: "{{ tester.user }}"
+    group: "{{ tester.user }}"
+    recurse: true
+
+- name: CICD | Ansible Tester | Copying management scripts
+  ansible.builtin.template:
+    src: "templates/usr/local/sbin/cicd/{{ item }}.sh.j2"
+    dest: "{{ tester.path.script_mgmt }}/{{ item }}.sh"
+    owner: 'root'
+    group: 'root'
+    mode: 0750
+  loop:
+    - 'run_all_tests'
+    - 'get_test_status'
+    - 'run_molecule_job'
+    - 'run_test'
+    - 'get_molecule_status'
+    - 'cleanup'
+    - 'get_failed'
+  tags: scripts
+
+- name: CICD | Ansible Tester | Copying test-scripts
+  ansible.builtin.template:
+    src: "templates/usr/local/bin/cicd/{{ test }}.sh.j2"
+    dest: "{{ tester.path.script }}/{{ test }}.sh"
+    owner: 'root'
+    group: "{{ tester.user }}"
+    mode: 0750
+  loop_control:
+    loop_var: test
+  loop:
+    - 'molecule'
+    - 'yamllint'
+    - 'ansiblelint'
+    - 'collection_lint'
+    - 'collection_test'
+  tags: scripts
+
+- name: CICD | Ansible Tester | Adding DNS
+  ansible.builtin.lineinfile:
+    dest: '/etc/hosts'
+    line: "{{ item }}"
+    state: present
+  loop:
+    - "{{ tester.docker.ip }} {{ tester.docker.dns }}"
+    - "{{ tester.collections.opnsense.ip }} {{ tester.collections.opnsense.dns }}"
+
+- name: CICD | Ansible Tester | Adding OPNSense key
+  ansible.builtin.copy:
+    src: 'files/home/tester/.secret/opn.key'
+    dest: "{{ tester.path.home }}/.secret/opn.key"
+    owner: "{{ tester.user }}"
+    group: "{{ tester.user }}"
+    mode: 0640
+
+- name: CICD | Ansible Tester | Adding docker-cleanup job
+  ansible.builtin.template:
+    src: "templates/etc/systemd/system/docker-clean.{{ item }}.j2"
+    dest: "/etc/systemd/system/docker-clean.{{ item }}"
+    owner: 'root'
+    group: "{{ tester.user }}"
+    mode: 0640
+  tags: [services]
+  loop:
+    - 'service'
+    - 'timer'
+
+- name: CICD | Ansible Tester | Starting/enabling cleanup job
+  ansible.builtin.systemd:
+    name: 'docker-clean.timer'
+    state: started
+    enabled: yes
+
+- name: CICD | Ansible Tester | Processing role jobs
+  ansible.builtin.include_tasks: jobs_role.yml
+  when: >
+    single_job is undefined or
+    single_job == repo_name or
+    single_job in repo_name
+  vars:
+    repo_name: "{{ job }}"
+    trigger_time_molecule: "{{ tester.trigger.molecule.start_time | add_time(tester.trigger.molecule.separation * job_idx) }}"
+    trigger_time_yamllint: "{{ tester.trigger.yamllint.start_time | add_time(tester.trigger.yamllint.separation * job_idx) }}"
+    trigger_time_ansiblelint: "{{ tester.trigger.ansiblelint.start_time | add_time(tester.trigger.ansiblelint.separation * job_idx) }}"
+  tags: [services, roles]
+  loop_control:
+    index_var: job_idx
+    loop_var: job
+  loop: "{{ tester.roles }}"
+
+- name: CICD | Ansible Tester | Processing collection jobs
+  ansible.builtin.include_tasks: jobs_collection.yml
+  when: >
+    single_job is undefined or
+    single_job == collection_name or
+    single_job in collection_name
+  vars:
+    collection_name: "{{ job.key }}"
+    trigger_time_test: "{{ tester.trigger.collection_test.start_time | add_time(tester.trigger.collection_test.separation * job_idx) }}"
+    trigger_time_lint: "{{ tester.trigger.collection_lint.start_time | add_time(tester.trigger.collection_lint.separation * job_idx) }}"
+  tags: [services, collections]
+  loop_control:
+    index_var: job_idx
+    loop_var: job
+  with_dict: "{{ tester.collections }}"
+
+- name: CICD | Ansible Tester | Daemon reload
+  ansible.builtin.systemd:
+    daemon_reload: yes
+  tags: [services]
