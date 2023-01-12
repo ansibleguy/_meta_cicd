@@ -17,11 +17,11 @@
     recurse: true
     mode: 0755
   loop:
-  - "{{ tester.path.test }}"
-  - "{{ tester.path.web }}"
-  - "{{ tester.path.venv }}"
-  - "{{ tester.path.script }}"
-  - "{{ tester.path.home }}/.secret"
+    - "{{ tester.path.test }}"
+    - "{{ tester.path.web }}"
+    - "{{ tester.path.venv }}"
+    - "{{ tester.path.script }}"
+    - "{{ tester.path.home }}/.secret"
 
 - name: CICD | Ansible Tester | Adding other directories
   ansible.builtin.file:
@@ -32,7 +32,7 @@
     recurse: true
     mode: 0755
   loop:
-  - "{{ tester.path.script_mgmt }}"
+    - "{{ tester.path.script_mgmt }}"
 
 - name: CICD | Ansible Tester | Installing packages
   ansible.builtin.apt:
