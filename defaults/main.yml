@@ -19,7 +19,7 @@ tester:
     collection_test:
       start_time: '02:00'
       day: '*-*-*'
-      separation: 600
+      separation: 1800
     collection_lint:
       start_time: '02:30'
       day: '*-*-*'
@@ -59,7 +59,7 @@ tester:
       'molecule', 'ansible-core', 'molecule-docker', 'pylint',
       'anybadge', 'httpx', 'validators', 'jmespath',
     ]
-    ansible_collections: ['community.general']
+    ansible_collections: ['community.general', 'ansible.utils']
 
   collections:
     opnsense:
