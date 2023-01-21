@@ -73,6 +73,7 @@ function log_error {
 
 mkdir -p "$PATH_TEST"
 source "$PATH_VENV/bin/activate"
+collection=0
 cleanup
 rm -f "$LOG_FILE"
 
@@ -90,6 +91,7 @@ update_badge
 if echo "$ROLE" | grep -q 'collection'
 then
   ROLE=$(echo "$ROLE" | cut -d '_' -f2)
+  collection=1
   PATH_TEST_FULL="$PATH_TEST/collections/ansible_collections/$GALAXY_NAMESPACE/$ROLE"
   rm -rf "$PATH_TEST_FULL"
   ansible-galaxy collection install "git+https://github.com/$GALAXY_NAMESPACE/collection_$ROLE" -p "$PATH_TEST/collections"
