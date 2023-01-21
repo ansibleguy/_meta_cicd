@@ -100,6 +100,7 @@
   loop:
     - 'molecule'
     - 'yamllint'
+    - 'pylint'
     - 'ansiblelint'
     - 'collection_lint'
     - 'collection_test'
@@ -150,6 +151,7 @@
     repo_name: "{{ job }}"
     trigger_time_molecule: "{{ tester.trigger.molecule.start_time | add_time(tester.trigger.molecule.separation * job_idx) }}"
     trigger_time_yamllint: "{{ tester.trigger.yamllint.start_time | add_time(tester.trigger.yamllint.separation * job_idx) }}"
+    trigger_time_pylint: "{{ tester.trigger.pylint.start_time | add_time(tester.trigger.pylint.separation * job_idx) }}"
     trigger_time_ansiblelint: "{{ tester.trigger.ansiblelint.start_time | add_time(tester.trigger.ansiblelint.separation * job_idx) }}"
   tags: [services, roles]
   loop_control:
