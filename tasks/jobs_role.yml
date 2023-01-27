@@ -7,7 +7,6 @@
     owner: 'root'
     group: "{{ tester.user }}"
     mode: 0640
-  tags: [services, roles]
   vars:
     test: 'molecule'
   loop:
@@ -23,7 +22,6 @@
     mode: 0640
   vars:
     test: 'yamllint'
-  tags: [services, roles]
   loop:
     - 'service'
     - 'timer'
@@ -37,7 +35,6 @@
     mode: 0640
   vars:
     test: 'pylint'
-  tags: [services, roles]
   loop:
     - 'service'
     - 'timer'
@@ -49,7 +46,6 @@
     owner: 'root'
     group: "{{ tester.user }}"
     mode: 0640
-  tags: [services, roles]
   vars:
     test: 'ansiblelint'
   loop:
@@ -62,7 +58,6 @@
     name: "{{ item }}"
     state: started
     enabled: yes
-  tags: [services, roles]
   loop:
     - "ansible-test-molecule-{{ repo_name }}.timer"
     - "ansible-test-yamllint-{{ repo_name }}.timer"
@@ -76,7 +71,6 @@
     executable: '/bin/bash'
     chdir: "{{ tester.path.web }}"
     creates: "{{ tester.path.web }}/{{ repo_name }}.{{ item.ext }}.svg"
-  tags: [roles]
   loop:
     - {label: 'YamlLint', ext: 'yamllint'}
     - {label: 'PyLint', ext: 'pylint'}

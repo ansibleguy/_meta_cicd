@@ -7,7 +7,6 @@
     owner: 'root'
     group: "{{ tester.user }}"
     mode: 0640
-  tags: [services, collections]
   loop:
     - 'service'
     - 'timer'
@@ -19,7 +18,6 @@
     owner: 'root'
     group: "{{ tester.user }}"
     mode: 0640
-  tags: [services, collections]
   loop:
     - 'service'
     - 'timer'
@@ -30,7 +28,6 @@
     name: "{{ item }}"
     state: started
     enabled: yes
-  tags: [services, collections]
   loop:
     - "ansible-test-collection-lint-{{ collection_name }}.timer"
     - "ansible-test-collection-{{ collection_name }}.timer"
@@ -43,7 +40,6 @@
     executable: '/bin/bash'
     chdir: "{{ tester.path.web }}"
     creates: "{{ tester.path.web }}/{{ item.file }}.svg"
-  tags: [collections]
   loop:
     - {label: 'LINT', file: "{{ collection_name }}.collection.lint"}
     - {label: "TEST {{ job.value.label }}", file: "{{ collection_name }}.collection.test"}

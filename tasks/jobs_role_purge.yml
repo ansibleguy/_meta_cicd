@@ -1,0 +1,47 @@
+---
+
+- name: "CICD | Ansible Tester | Role {{ repo_name }} | Stopping/Disabling jobs"
+  ansible.builtin.systemd:
+    daemon_reload: yes
+    name: "ansible-test-{{ item }}"
+    state: stopped
+    enabled: false
+  ignore_errors: true
+  loop:
+    - "molecule-{{ repo_name }}.service"
+    - "molecule-{{ repo_name }}.timer"
+    - "yamllint-{{ repo_name }}.service"
+    - "yamllint-{{ repo_name }}.timer"
+    - "pylint-{{ repo_name }}.service"
+    - "pylint-{{ repo_name }}.timer"
+    - "ansiblelint-{{ repo_name }}.service"
+    - "ansiblelint-{{ repo_name }}.timer"
+
+- name: "CICD | Ansible Tester | Role {{ repo_name }} | Removing jobs"
+  ansible.builtin.file:
+    dest: "/etc/systemd/system/ansible-test-{{ item }}"
+    state: absent
+  loop:
+    - "molecule-{{ repo_name }}.service"
+    - "molecule-{{ repo_name }}.timer"
+    - "yamllint-{{ repo_name }}.service"
+    - "yamllint-{{ repo_name }}.timer"
+    - "pylint-{{ repo_name }}.service"
+    - "pylint-{{ repo_name }}.timer"
+    - "ansiblelint-{{ repo_name }}.service"
+    - "ansiblelint-{{ repo_name }}.timer"
+
+- name: "CICD | Ansible Tester | Role {{ repo_name }} | Removing badges"
+  ansible.builtin.file:
+    dest: "{{ tester.path.web }}/{{ repo_name }}.{{ item }}.svg"
+    state: absent
+  loop:
+    - 'yamllint'
+    - 'pylint'
+    - 'ansiblelint'
+    - 'molecule'
+
+- name: "CICD | Ansible Tester | Role {{ repo_name }} | Removing logs"
+  ansible.builtin.file:
+    dest: "{{ tester.path.web }}/log/molecule_{{ repo_name }}_test.log"
+    state: absent

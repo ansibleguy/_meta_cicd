@@ -153,11 +153,28 @@
     trigger_time_yamllint: "{{ tester.trigger.yamllint.start_time | add_time(tester.trigger.yamllint.separation * job_idx) }}"
     trigger_time_pylint: "{{ tester.trigger.pylint.start_time | add_time(tester.trigger.pylint.separation * job_idx) }}"
     trigger_time_ansiblelint: "{{ tester.trigger.ansiblelint.start_time | add_time(tester.trigger.ansiblelint.separation * job_idx) }}"
+  args:
+    apply:
+      tags: [services, roles]
   tags: [services, roles]
   loop_control:
     index_var: job_idx
     loop_var: job
   loop: "{{ tester.roles }}"
+
+- name: CICD | Ansible Tester | Purging role jobs
+  ansible.builtin.include_tasks: jobs_role_purge.yml
+  when: >
+    single_job is undefined or
+    single_job == repo_name or
+    single_job in repo_name
+  args:
+    apply:
+      tags: [services, roles, purge]
+  tags: [services, roles, purge]
+  loop_control:
+    loop_var: repo_name
+  loop: "{{ tester.roles_absent }}"
 
 - name: CICD | Ansible Tester | Processing collection jobs
   ansible.builtin.include_tasks: jobs_collection.yml
@@ -169,6 +186,9 @@
     collection_name: "{{ job.key }}"
     trigger_time_test: "{{ tester.trigger.collection_test.start_time | add_time(tester.trigger.collection_test.separation * job_idx) }}"
     trigger_time_lint: "{{ tester.trigger.collection_lint.start_time | add_time(tester.trigger.collection_lint.separation * job_idx) }}"
+  args:
+    apply:
+      tags: [services, collections]
   tags: [services, collections]
   loop_control:
     index_var: job_idx
@@ -178,4 +198,4 @@
 - name: CICD | Ansible Tester | Daemon reload
   ansible.builtin.systemd:
     daemon_reload: yes
-  tags: [services]
+  tags: always
