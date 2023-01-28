@@ -62,6 +62,7 @@
     - "ansible-test-molecule-{{ repo_name }}.timer"
     - "ansible-test-yamllint-{{ repo_name }}.timer"
     - "ansible-test-ansiblelint-{{ repo_name }}.timer"
+    - "ansible-test-pylint-{{ repo_name }}.timer"
 
 - name: "CICD | Ansible Tester | Role {{ repo_name }} | Adding initial badges"
   ansible.builtin.shell: |
