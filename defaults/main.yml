@@ -79,7 +79,7 @@ tester:
     - 'infra_apache'
     - 'infra_certs'
     - 'infra_django_apache'
-    #    - 'infra_docker_minimal'
+    - 'infra_docker_minimal'
     - 'infra_mariadb'
     - 'infra_nginx'
     - 'infra_wireguard'
