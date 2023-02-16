@@ -19,6 +19,7 @@ PATH_VENV='{{ tester.path.venv }}'
 LABEL='PyLint'
 status='RUNNING'
 GALAXY_NAMESPACE='ansibleguy'
+CONFIG_J2='.pylintrc_j2'
 
 declare -A BADGE_COLORS
 BADGE_COLORS[UNKNOWN]='#{{ tester.colors.wait }}'
@@ -80,7 +81,19 @@ if ! pylint --recursive=y .
 then
   status='FAILED'
 else
-  status='PASSED'
+  # test .py.j2 files (jinja templated scripts)
+  j2_cnf=''
+  if [ -f "$CONFIG_J2" ]
+  then
+    j2_cnf=" --rcfile $(pwd)/${CONFIG_J2}"
+  fi
+
+  if ! find -type f -name *.py.j2 -print0 | xargs -0 -n1 pylint${j2_cnf}
+  then
+    status='FAILED-J2'
+  else
+    status='PASSED'
+  fi
 fi
 
 update_badge
