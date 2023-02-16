@@ -26,6 +26,7 @@ BADGE_COLORS[UNKNOWN]='#{{ tester.colors.wait }}'
 BADGE_COLORS[RUNNING]='#{{ tester.colors.run }}'
 BADGE_COLORS[PASSED]='#{{ tester.colors.ok }}'
 BADGE_COLORS[FAILED]='#{{ tester.colors.bad }}'
+BADGE_COLORS[FAILED-J2]='#{{ tester.colors.bad }}'
 BADGE_COLORS[FAILED-ENVIRONMENT]='#{{ tester.colors.bad }}'
 
 ROLE="$1"
@@ -88,7 +89,7 @@ else
     j2_cnf=" --rcfile $(pwd)/${CONFIG_J2}"
   fi
 
-  if ! find -type f -name *.py.j2 -print0 | xargs -0 -n1 pylint${j2_cnf}
+  if ! find -type f -name *.py.j2 -print0 | xargs --no-run-if-empty -0 -n1 pylint${j2_cnf}
   then
     status='FAILED-J2'
   else

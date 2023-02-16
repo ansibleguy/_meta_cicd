@@ -1,0 +1,17 @@
+#!/usr/bin/env bash
+
+set -euo pipefail
+
+failed=$(systemctl list-units --failed | grep 'tests of' | cut -d ' ' -f2)
+
+# NOTE: from-address is set using postfix + executing user
+
+if echo "$failed" | grep -q 'ansible-test'
+then
+  {
+    echo 'To: guy@ansibleguy.net'
+    echo "Subject: Failed Tests $(date +'%Y-%m-%d')"
+    echo ''
+    echo "$failed"
+  } | /usr/lib/sendmail -t
+fi

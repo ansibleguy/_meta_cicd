@@ -96,6 +96,7 @@ tester:
     - 'sw_proxmox_mail_gw'
     - 'sw_mailcow'
     - 'collection_nftables'
+    - 'infra_pki'
 
   roles_absent:
     - 'sw_iredmail'

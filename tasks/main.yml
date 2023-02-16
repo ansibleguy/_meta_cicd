@@ -19,6 +19,16 @@
   loop:
     - "{{ tester.path.test }}"
     - "{{ tester.path.web }}"
+
+- name: CICD | Ansible Tester | Adding tester read-only directories
+  ansible.builtin.file:
+    path: "{{ item }}"
+    state: directory
+    owner: 'root'
+    group: "{{ tester.user }}"
+    recurse: true
+    mode: 0755
+  loop:
     - "{{ tester.path.venv }}"
     - "{{ tester.path.script }}"
     - "{{ tester.path.home }}/.secret"
@@ -51,7 +61,7 @@
   ansible.builtin.file:
     path: "{{ tester.path.venv }}"
     state: directory
-    owner: "{{ tester.user }}"
+    owner: 'root'
     group: "{{ tester.user }}"
     recurse: true
 
@@ -86,6 +96,7 @@
     - 'get_molecule_status'
     - 'cleanup'
     - 'get_failed'
+    - 'mail_failed'
   tags: scripts
 
 - name: CICD | Ansible Tester | Copying test-scripts
@@ -119,7 +130,7 @@
   ansible.builtin.copy:
     src: 'files/home/tester/.secret/opn.key'
     dest: "{{ tester.path.home }}/.secret/opn.key"
-    owner: "{{ tester.user }}"
+    owner: 'root'
     group: "{{ tester.user }}"
     mode: 0640
 
