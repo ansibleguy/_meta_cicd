@@ -8,13 +8,15 @@ echo ''
 echo 'FAILED TESTS:'
 echo ''
 
+failed_tests=$(systemctl list-units --failed | grep 'tests of' | cut -d ' ' -f2)
+
 if [ -z "$1" ]
 then
     echo 'Provide a test-type to filter the output!'
     echo ''
-    systemctl list-units --failed | grep 'tests of' | cut -d ' ' -f2
+    echo "$failed_tests"
 else
-    systemctl list-units --failed | grep 'tests of' | cut -d ' ' -f2 | grep "$1"
+    echo "$failed_tests" | grep "$1"
 fi
 
 echo ''

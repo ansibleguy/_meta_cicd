@@ -27,7 +27,7 @@
     owner: 'root'
     group: "{{ tester.user }}"
     recurse: true
-    mode: 0755
+    mode: 0750
   loop:
     - "{{ tester.path.venv }}"
     - "{{ tester.path.script }}"
@@ -39,7 +39,6 @@
     state: directory
     owner: 'root'
     group: 'root'
-    recurse: true
     mode: 0755
   loop:
     - "{{ tester.path.script_mgmt }}"
@@ -96,7 +95,6 @@
     - 'get_molecule_status'
     - 'cleanup'
     - 'get_failed'
-    - 'mail_failed'
   tags: scripts
 
 - name: CICD | Ansible Tester | Copying test-scripts
@@ -115,6 +113,8 @@
     - 'ansiblelint'
     - 'collection_lint'
     - 'collection_test'
+    - 'post_exec'
+    - 'mail_failed'
   tags: scripts
 
 - name: CICD | Ansible Tester | Adding DNS
@@ -160,10 +160,11 @@
     single_job in repo_name
   vars:
     repo_name: "{{ job }}"
-    trigger_time_molecule: "{{ tester.trigger.molecule.start_time | add_time(tester.trigger.molecule.separation * job_idx) }}"
-    trigger_time_yamllint: "{{ tester.trigger.yamllint.start_time | add_time(tester.trigger.yamllint.separation * job_idx) }}"
-    trigger_time_pylint: "{{ tester.trigger.pylint.start_time | add_time(tester.trigger.pylint.separation * job_idx) }}"
-    trigger_time_ansiblelint: "{{ tester.trigger.ansiblelint.start_time | add_time(tester.trigger.ansiblelint.separation * job_idx) }}"
+    trigger_time:
+      molecule: "{{ tester.trigger.molecule.start_time | add_time(tester.trigger.molecule.separation * job_idx) }}"
+      yamllint: "{{ tester.trigger.yamllint.start_time | add_time(tester.trigger.yamllint.separation * job_idx) }}"
+      pylint: "{{ tester.trigger.pylint.start_time | add_time(tester.trigger.pylint.separation * job_idx) }}"
+      ansiblelint: "{{ tester.trigger.ansiblelint.start_time | add_time(tester.trigger.ansiblelint.separation * job_idx) }}"
   args:
     apply:
       tags: [services, roles]

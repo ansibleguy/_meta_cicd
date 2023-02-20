@@ -100,3 +100,7 @@ tester:
 
   roles_absent:
     - 'sw_iredmail'
+
+  rc:
+    soft_fail: 99
+    file: '/tmp/.test_'

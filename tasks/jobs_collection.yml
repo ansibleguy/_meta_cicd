@@ -10,6 +10,7 @@
   loop:
     - 'service'
     - 'timer'
+  tags: services
 
 - name: "CICD | Ansible Tester | Collection {{ collection_name }} | Adding lint job"
   ansible.builtin.template:
@@ -21,16 +22,18 @@
   loop:
     - 'service'
     - 'timer'
+  tags: services
 
 - name: "CICD | Ansible Tester | Collection {{ collection_name }} | Starting/enabling jobs"
   ansible.builtin.systemd:
     daemon_reload: yes
-    name: "{{ item }}"
+    name: "ansible-test-collection-{{ item }}.timer"
     state: started
     enabled: yes
   loop:
-    - "ansible-test-collection-lint-{{ collection_name }}.timer"
-    - "ansible-test-collection-{{ collection_name }}.timer"
+    - "{{ collection_name }}"
+    - "lint-{{ collection_name }}"
+  tags: services
 
 - name: "CICD | Ansible Tester | Collection {{ collection_name }} | Adding initial badges"
   ansible.builtin.shell: |

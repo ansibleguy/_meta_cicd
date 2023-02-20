@@ -19,6 +19,8 @@ HOME='{{ tester.path.home }}'
 COLLECTION="$1"
 LABEL='LINT'
 status='RUNNING'
+EXIT_CODE_FAILED='{{ tester.rc.soft_fail }}'
+exit_code=0
 
 declare -A BADGE_COLORS
 BADGE_COLORS[UNKNOWN]='#{{ tester.colors.wait }}'
@@ -48,6 +50,7 @@ chmod +x ./scripts/lint.sh
 if ! ./scripts/lint.sh
 then
   status='FAILED'
+  exit_code="$EXIT_CODE_FAILED"
 else
   status='PASSED'
 fi
@@ -55,4 +58,4 @@ fi
 update_badge
 cd /tmp
 rm -rf "$PATH_TEST/collection_$COLLECTION"
-exit 0
+exit "$exit_code"

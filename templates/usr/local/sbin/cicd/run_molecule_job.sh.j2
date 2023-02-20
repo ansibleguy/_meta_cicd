@@ -16,10 +16,13 @@ fi
 
 for FILE in /etc/systemd/system/ansible-test-molecule-*$1*.service
 do
-  svc=$(echo $FILE | cut -d '/' -f5)
-  echo "Starting '$svc'"
-  systemctl start "$svc" --no-block
-  journalctl -u "$svc" --no-pager -f
+  if ! echo "$FILE" | grep -q 'fail'
+  then
+    svc=$(echo "$FILE" | cut -d '/' -f5)
+    echo "Starting '$svc'"
+    systemctl start "$svc" --no-block
+    journalctl -u "$svc" --no-pager -f
+  fi
 done
 
 echo ''

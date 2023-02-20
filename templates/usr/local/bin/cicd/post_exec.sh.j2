@@ -1,0 +1,22 @@
+#!/usr/bin/env bash
+
+set -euo pipefail
+
+EXIT_CODE_SOFT='{{ tester.rc.soft_fail }}'
+EXIT_CODE_FILE='{{ tester.rc.file }}'
+
+test_script="$1"
+test="$2"
+repo_name="$3"
+
+exit_code=$(cat "${EXIT_CODE_FILE}${repo_name}_${test}.rc")
+
+if [ "$exit_code" != '0' ] && [ "$exit_code" != "$EXIT_CODE_SOFT" ]
+then
+  $test_script "$repo_name" 'FAILED-ENVIRONMENT'
+fi
+
+# if [ "$exit_code" == "$EXIT_CODE_SOFT" ]
+# then
+#   exit "$EXIT_CODE_SOFT"
+# fi

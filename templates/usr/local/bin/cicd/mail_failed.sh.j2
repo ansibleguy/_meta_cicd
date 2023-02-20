@@ -1,0 +1,18 @@
+#!/usr/bin/env bash
+
+set -euo pipefail
+
+failed_tests=$(systemctl list-units --failed | grep 'tests of' | cut -d ' ' -f2)
+failed_test_count=$(echo "$failed_tests" | wc -l)
+
+# NOTE: from-address is set using postfix + executing user
+
+if echo "$failed_tests" | grep -q 'ansible-test'
+then
+  {
+    echo 'To: guy@ansibleguy.net'
+    echo "Subject: Failed Tests $(date +'%Y-%m-%d')"
+    echo ''
+    printf "FAILED TESTS:\n\nCOUNT: %s\n\n%s\n" "$failed_test_count" "$failed_tests"
+  } | /usr/lib/sendmail -t
+fi

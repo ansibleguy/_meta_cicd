@@ -19,6 +19,8 @@ PATH_VENV='{{ tester.path.venv }}'
 LABEL='Ansible-Lint'
 status='RUNNING'
 GALAXY_NAMESPACE='ansibleguy'
+EXIT_CODE_FAILED='{{ tester.rc.soft_fail }}'
+exit_code=0
 
 declare -A BADGE_COLORS
 BADGE_COLORS[UNKNOWN]='#{{ tester.colors.wait }}'
@@ -26,7 +28,6 @@ BADGE_COLORS[RUNNING]='#{{ tester.colors.run }}'
 BADGE_COLORS[PASSED]='#{{ tester.colors.ok }}'
 BADGE_COLORS[FAILED]='#{{ tester.colors.bad }}'
 BADGE_COLORS[FAILED-ENVIRONMENT]='#{{ tester.colors.bad }}'
-
 
 ROLE="$1"
 
@@ -80,6 +81,7 @@ set +e  # soft-handling of failures
 if ! ansible-lint -c .ansible-lint.yml --exclude "$(find . -type f -name 'requirements*.yml')" .
 then
   status='FAILED'
+  exit_code="$EXIT_CODE_FAILED"
 else
   status='PASSED'
 fi
@@ -87,4 +89,4 @@ fi
 update_badge
 cd /tmp
 rm -rf "$PATH_TEST_FULL"
-exit 0
+exit "$exit_code"

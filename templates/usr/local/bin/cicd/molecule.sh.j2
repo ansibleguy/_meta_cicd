@@ -17,11 +17,13 @@ PATH_BADGE='{{ tester.path.web }}'
 PATH_VENV='{{ tester.path.venv }}'
 PATH_LOG="$PATH_BADGE/log"
 HOME='{{ tester.path.home }}'
-LOG_LINES={{ tester.log.lines }}
+LOG_LINES='{{ tester.log.lines }}'
 
 LABEL='Molecule'
 status='RUNNING'
 GALAXY_NAMESPACE='ansibleguy'
+EXIT_CODE_FAILED='{{ tester.rc.soft_fail }}'
+exit_code=0
 
 declare -A BADGE_COLORS
 BADGE_COLORS[UNKNOWN]='#{{ tester.colors.wait }}'
@@ -69,6 +71,7 @@ function cleanup {
 
 function log_error {
   journalctl -u "ansible-test-molecule-$ROLE.service" --full --no-pager -n "$LOG_LINES" > "$LOG_FILE"
+  exit_code="$EXIT_CODE_FAILED"
 }
 
 mkdir -p "$PATH_TEST"
@@ -144,4 +147,4 @@ fi
 
 update_badge
 cleanup
-exit 0
+exit "$exit_code"

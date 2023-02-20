@@ -18,13 +18,15 @@ PATH_BADGE='{{ tester.path.web }}'
 PATH_LOG="$PATH_BADGE/log"
 PATH_VENV='{{ tester.path.venv }}'
 HOME='{{ tester.path.home }}'
-LOG_LINES={{ tester.log.lines }}
+LOG_LINES='{{ tester.log.lines }}'
 
 COLLECTION="$1"
 LABEL="TEST $2"
 TEST_ARGS="${@:3}"
 status='RUNNING'
 LOG_FILE="${PATH_LOG}/collection_${COLLECTION}_test.log"
+EXIT_CODE_FAILED='{{ tester.rc.soft_fail }}'
+exit_code=0
 
 declare -A BADGE_COLORS
 BADGE_COLORS[UNKNOWN]='#{{ tester.colors.wait }}'
@@ -56,6 +58,7 @@ chmod +x ./scripts/test_cleanup.sh
 if ! ./scripts/test_cleanup.sh $TEST_ARGS "$PATH_VENV"
 then
   echo 'PRE-CLEANUP FAILED'
+  exit_code="$EXIT_CODE_FAILED"
 else
   echo 'PRE-CLEANUP SUCCESSFUL'
 fi
@@ -64,6 +67,7 @@ if ! ./scripts/test.sh $TEST_ARGS "$PATH_VENV"
 then
   status='FAILED'
   journalctl -u "ansible-test-collection-$COLLECTION.service" --full --no-pager -n "$LOG_LINES" > "$LOG_FILE"
+  exit_code="$EXIT_CODE_FAILED"
 else
   status='PASSED'
 fi
@@ -71,6 +75,7 @@ fi
 if ! ./scripts/test_cleanup.sh $TEST_ARGS "$PATH_VENV"
 then
   echo 'POST-CLEANUP FAILED'
+  exit_code="$EXIT_CODE_FAILED"
 else
   echo 'POST-CLEANUP SUCCESSFUL'
 fi
@@ -78,4 +83,4 @@ fi
 update_badge
 cd /tmp
 rm -rf "$PATH_TEST/collection_$COLLECTION"
-exit 0
+exit "$exit_code"

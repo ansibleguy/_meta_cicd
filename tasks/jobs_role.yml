@@ -1,68 +1,73 @@
 ---
 
-- name: "CICD | Ansible Tester | Role {{ repo_name }} | Adding molecule job"
+- name: "CICD | Ansible Tester | Role {{ repo_name }} | Adding molecule service"
   ansible.builtin.template:
-    src: "templates/etc/systemd/system/ansible-test-{{ test }}.{{ item }}.j2"
-    dest: "/etc/systemd/system/ansible-test-{{ test }}-{{ repo_name }}.{{ item }}"
+    src: "templates/etc/systemd/system/ansible-test-molecule.service.j2"
+    dest: "/etc/systemd/system/ansible-test-molecule-{{ repo_name }}.service"
     owner: 'root'
     group: "{{ tester.user }}"
     mode: 0640
-  vars:
-    test: 'molecule'
-  loop:
-    - 'service'
-    - 'timer'
+  tags: services
 
-- name: "CICD | Ansible Tester | Role {{ repo_name }} | Adding yamllint job"
+- name: "CICD | Ansible Tester | Role {{ repo_name }} | Adding services"
   ansible.builtin.template:
-    src: "templates/etc/systemd/system/ansible-test-{{ test }}.{{ item }}.j2"
-    dest: "/etc/systemd/system/ansible-test-{{ test }}-{{ repo_name }}.{{ item }}"
+    src: "templates/etc/systemd/system/ansible-test-default.service.j2"
+    dest: "/etc/systemd/system/ansible-test-{{ test }}-{{ repo_name }}.service"
     owner: 'root'
     group: "{{ tester.user }}"
     mode: 0640
-  vars:
-    test: 'yamllint'
+  loop_control:
+    loop_var: 'test'
   loop:
-    - 'service'
-    - 'timer'
+    - 'yamllint'
+    - 'ansiblelint'
+    - 'pylint'
+  tags: services
 
-- name: "CICD | Ansible Tester | Role {{ repo_name }} | Adding pylint job"
+- name: "CICD | Ansible Tester | Role {{ repo_name }} | Adding fail-handlers"
   ansible.builtin.template:
-    src: "templates/etc/systemd/system/ansible-test-{{ test }}.{{ item }}.j2"
-    dest: "/etc/systemd/system/ansible-test-{{ test }}-{{ repo_name }}.{{ item }}"
+    src: "templates/etc/systemd/system/ansible-test-default-fail.service.j2"
+    dest: "/etc/systemd/system/ansible-test-{{ test }}-{{ repo_name }}-fail.service"
     owner: 'root'
     group: "{{ tester.user }}"
     mode: 0640
-  vars:
-    test: 'pylint'
+  loop_control:
+    loop_var: 'test'
   loop:
-    - 'service'
-    - 'timer'
+    - 'molecule'
+    - 'yamllint'
+    - 'ansiblelint'
+    - 'pylint'
+  tags: services
 
-- name: "CICD | Ansible Tester | Role {{ repo_name }} | Adding ansible-lint job"
+- name: "CICD | Ansible Tester | Role {{ repo_name }} | Adding timers"
   ansible.builtin.template:
-    src: "templates/etc/systemd/system/ansible-test-{{ test }}.{{ item }}.j2"
-    dest: "/etc/systemd/system/ansible-test-{{ test }}-{{ repo_name }}.{{ item }}"
+    src: "templates/etc/systemd/system/ansible-test-default.timer.j2"
+    dest: "/etc/systemd/system/ansible-test-{{ test }}-{{ repo_name }}.timer"
     owner: 'root'
     group: "{{ tester.user }}"
     mode: 0640
-  vars:
-    test: 'ansiblelint'
+  loop_control:
+    loop_var: 'test'
   loop:
-    - 'service'
-    - 'timer'
+    - 'molecule'
+    - 'yamllint'
+    - 'ansiblelint'
+    - 'pylint'
+  tags: services
 
 - name: "CICD | Ansible Tester | Role {{ repo_name }} | Starting/enabling jobs"
   ansible.builtin.systemd:
     daemon_reload: yes
-    name: "{{ item }}"
+    name: "ansible-test-{{ item }}-{{ repo_name }}.timer"
     state: started
     enabled: yes
   loop:
-    - "ansible-test-molecule-{{ repo_name }}.timer"
-    - "ansible-test-yamllint-{{ repo_name }}.timer"
-    - "ansible-test-ansiblelint-{{ repo_name }}.timer"
-    - "ansible-test-pylint-{{ repo_name }}.timer"
+    - 'molecule'
+    - 'yamllint'
+    - 'ansiblelint'
+    - 'pylint'
+  tags: services
 
 - name: "CICD | Ansible Tester | Role {{ repo_name }} | Adding initial badges"
   ansible.builtin.shell: |

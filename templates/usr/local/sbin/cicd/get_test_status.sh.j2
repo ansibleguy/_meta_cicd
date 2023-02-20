@@ -15,7 +15,7 @@ then
   exit 1
 fi
 
-for FILE in /etc/systemd/system/ansible-test-$1-*$2*.service
+for FILE in /etc/systemd/system/ansible-test-$1-*$2.service
 do
   svc=$(echo $FILE | cut -d '/' -f5)
   echo "Checking status for '$svc'"
