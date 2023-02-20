@@ -16,11 +16,11 @@ fi
 
 for FILE in /etc/systemd/system/ansible-test-$1-*.service
 do
-  if ! echo "$FILE" | grep -q 'fail'
+  if ! echo "$FILE" | grep -Eq 'fail|collection'
   then
     svc=$(echo "$FILE" | cut -d '/' -f5)
     echo "Starting '$svc'"
-    systemctl start "$svc"
+    systemctl start "$svc" --no-block
   fi
 done
 
