@@ -70,7 +70,7 @@ tester:
       label: 'OPNSense v23.1'  # todo: dynamic lookup of version number
       ip: '172.17.1.52'
       dns: 'opn-test.local'
-      test_args: ['opn-test.local', '/home/tester/.secret/opn.key']
+      test_args: ['opn-test.local', '0', '/home/tester/.secret/opn.key']
 
   log:
     lines: 300
