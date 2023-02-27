@@ -107,6 +107,7 @@
   loop_control:
     loop_var: test
   loop:
+    - 'wrapper'
     - 'molecule'
     - 'yamllint'
     - 'pylint'

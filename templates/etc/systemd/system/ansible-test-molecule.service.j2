@@ -3,13 +3,12 @@
 
 [Unit]
 Description=Service to run ansible molecule tests of repository '{{ repo_name }}'
-OnFailure=ansible-test-molecule-{{ repo_name }}-fail.service
 
 [Service]
 Type=oneshot
 User={{ tester.user }}
 Group={{ tester.user }}
-ExecStart=/bin/bash -c "/usr/bin/timeout 3600 /bin/bash {{ tester.path.script }}/molecule.sh '{{ repo_name }}' && echo 0 > {{ tester.rc.file }}{{ repo_name }}_molecule.rc || echo "$?" > {{ tester.rc.file }}{{ repo_name }}_molecule.rc"
+ExecStart=/bin/bash -c "/usr/bin/timeout 3600 /bin/bash {{ tester.path.script }}/wrapper.sh 'molecule' '{{ repo_name }}'"
 {% if ansible_distribution_version == '10' %}
 StandardOutput=syslog
 StandardError=syslog

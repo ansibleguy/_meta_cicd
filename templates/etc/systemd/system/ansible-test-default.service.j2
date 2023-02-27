@@ -3,7 +3,6 @@
 
 [Unit]
 Description=Service to run {{ test }} tests of repository '{{ repo_name }}'
-OnFailure=ansible-test-{{ test }}-{{ repo_name }}-fail.service
 
 [Service]
 Type=oneshot
@@ -11,7 +10,7 @@ User={{ tester.user }}
 Group={{ tester.user }}
 ExecStartPre=mkdir -p {{ tester.path.test }}/{{ test }}
 ExecStartPre=rm -rf {{ tester.path.test }}/{{ test }}/{{ repo_name }}
-ExecStart=/bin/bash -c "{{ tester.path.script }}/{{ test }}.sh '{{ repo_name }}' && echo 0 > {{ tester.rc.file }}{{ repo_name }}_{{ test }}.rc || echo "$?" > {{ tester.rc.file }}{{ repo_name }}_{{ test }}.rc"
+ExecStart=/bin/bash -c "{{ tester.path.script }}/wrapper.sh '{{ test }}' '{{ repo_name }}'"
 {% if ansible_distribution_version == '10' %}
 StandardOutput=syslog
 StandardError=syslog
