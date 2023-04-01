@@ -32,6 +32,7 @@
     - "{{ tester.path.venv }}"
     - "{{ tester.path.script }}"
     - "{{ tester.path.home }}/.secret"
+    - "{{ tester.path.home }}/.ssh"
 
 - name: CICD | Ansible Tester | Adding other directories
   ansible.builtin.file:
@@ -40,8 +41,7 @@
     owner: 'root'
     group: 'root'
     mode: 0755
-  loop:
-    - "{{ tester.path.script_mgmt }}"
+  loop: ["{{ tester.path.script_mgmt }}"]
 
 - name: CICD | Ansible Tester | Installing packages
   ansible.builtin.apt:
@@ -118,7 +118,7 @@
     - 'mail_failed'
   tags: scripts
 
-- name: CICD | Ansible Tester | Adding DNS
+- name: CICD | Ansible Tester | Adding DNS (for easier debugging)
   ansible.builtin.lineinfile:
     dest: '/etc/hosts'
     line: "{{ item }}"
@@ -126,14 +126,23 @@
   loop:
     - "{{ tester.docker.ip }} {{ tester.docker.dns }}"
     - "{{ tester.collections.opnsense.ip }} {{ tester.collections.opnsense.dns }}"
+    - "{{ tester.collections.linuxha.node1.ip }} {{ tester.collections.linuxha.node1.dns }}"
+    - "{{ tester.collections.linuxha.node2.ip }} {{ tester.collections.linuxha.node2.dns }}"
+  tags: collections
 
-- name: CICD | Ansible Tester | Adding OPNSense key
+- name: CICD | Ansible Tester | Adding test-keys
   ansible.builtin.copy:
-    src: 'files/home/tester/.secret/opn.key'
-    dest: "{{ tester.path.home }}/.secret/opn.key"
+    src: "files/home/tester/{{ item }}"
+    dest: "{{ tester.path.home }}/{{ item }}"
     owner: 'root'
     group: "{{ tester.user }}"
     mode: 0640
+  no_log: true
+  loop:
+    - '.ssh/id_ed25519'
+    - '.secret/opn.key'
+    - '.secret/lha.yml'
+  tags: collections
 
 - name: CICD | Ansible Tester | Adding docker-cleanup job
   ansible.builtin.template:

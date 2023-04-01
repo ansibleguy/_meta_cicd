@@ -71,6 +71,16 @@ tester:
       ip: '172.17.1.52'
       dns: 'opn-test.local'
       test_args: ['opn-test.local', '/home/tester/.secret/opn.key', '0']
+    linuxha:
+      label: 'CS 3.1.2 | PM 2.0.5'
+      # debian 11; corosync: 3.1.2-2; pacemaker: 2.0.5-2
+      node1:
+        ip: '172.17.1.54'
+        dns: 'node1.local'
+      node2:
+        ip: '172.17.1.53'
+        dns: 'node2.local'
+      test_args: ['node1.local', 'node2.local', '/home/tester/.secret/lha.yml', '0']
 
   log:
     lines: 300
@@ -97,6 +107,8 @@ tester:
     - 'sw_mailcow'
     - 'collection_nftables'
     - 'infra_pki'
+    - 'collection_linuxha'
+    # - 'collection_systemd' => only basic linting for now..
 
   roles_absent:
     - 'sw_iredmail'
