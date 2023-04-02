@@ -56,12 +56,13 @@ tester:
       'python3', 'python3-virtualenv', 'python3-pip',
       'libssl-dev', 'git', 'rsync',
     ]
-    # python3-httpx, python3-validators => ansible in venv not completely working..
     pip: [
       'setuptools',
       'ansible', 'molecule', 'ansible-core', 'molecule-docker',
-      'anybadge', 'httpx', 'validators', 'jmespath',
+      'anybadge', 'jmespath',
       'yamllint', 'ansible-lint', 'pylint', 'flake8',
+      # collections
+      'httpx', 'xmltodict',
     ]
     ansible_collections: ['community.general', 'ansible.utils']
 
@@ -72,8 +73,8 @@ tester:
       dns: 'opn-test.local'
       test_args: ['opn-test.local', '/home/tester/.secret/opn.key', '0']
     linuxha:
-      label: 'CS 3.1.2 | PM 2.0.5'
-      # debian 11; corosync: 3.1.2-2; pacemaker: 2.0.5-2
+      label: 'SH-4.2.1 | CS-3.1.2 | PM-2.0.5'
+      # debian 11; crmsh: 4.2.1; corosync: 3.1.2-2; pacemaker: 2.0.5-2
       node1:
         ip: '172.17.1.54'
         dns: 'node1.local'
