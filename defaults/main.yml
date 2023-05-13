@@ -68,7 +68,7 @@ tester:
 
   collections:
     opnsense:
-      label: 'OPNSense v23.1.6'  # todo: dynamic lookup of version number
+      label: 'OPNSense v23.1.7'  # todo: dynamic lookup of version number
       ip: '172.17.1.52'
       dns: 'opn-test.local'
       test_args: ['opn-test.local', '/home/tester/.secret/opn.key', '0']
