@@ -109,6 +109,7 @@ tester:
     - 'collection_nftables'
     - 'infra_pki'
     - 'collection_linuxha'
+    - 'sw_semaphore'
     # - 'collection_systemd' => only basic linting for now..
 
   roles_absent:
