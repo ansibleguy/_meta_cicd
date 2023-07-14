@@ -110,6 +110,7 @@ tester:
     - 'infra_pki'
     - 'collection_linuxha'
     - 'sw_semaphore'
+    - 'infra_openvpn'
     # - 'collection_systemd' => only basic linting for now..
 
   roles_absent:
