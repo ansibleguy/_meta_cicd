@@ -22,6 +22,7 @@ LOG_LINES='{{ tester.log.lines }}'
 LABEL='Molecule'
 status='RUNNING'
 GALAXY_NAMESPACE='ansibleguy'
+MOLECULE_CONFIG='molecule/default/molecule.yml'
 EXIT_CODE_FAILED='{{ tester.rc.soft_fail }}'
 exit_code=0
 
@@ -106,7 +107,7 @@ fi
 
 cd "$PATH_TEST_FULL"
 
-if ! [ -f 'molecule/default/molecule.yml' ]
+if ! [ -f "$MOLECULE_CONFIG" ]
 then
   status='MISSING'
   update_badge
@@ -134,7 +135,8 @@ else
       status='FAILED-IDEMPOTENCE'
       log_error
     else
-      if ! molecule check
+      # check-mode can be disabled
+      if cat "$MOLECULE_CONFIG" | grep '  - check' -q && ! molecule check
       then
         status='FAILED-CHECK'
         log_error
