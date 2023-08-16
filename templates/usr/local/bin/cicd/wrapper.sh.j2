@@ -15,6 +15,7 @@ if $TEST_SCRIPT "$REPO_NAME"
 then
   exit 0
 else
+  # todo: failed-environment not working if molecule fails
   $FAIL_SCRIPT "$TEST_SCRIPT" "$TEST" "$REPO_NAME"
   exit 1
 fi
