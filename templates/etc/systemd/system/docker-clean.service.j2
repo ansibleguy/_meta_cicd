@@ -17,4 +17,4 @@ StandardError=journal
 SyslogIdentifier=cicd_cleanup
 TimeoutSec=3600
 
-Environment="DOCKER_HOST='{{ tester.docker.url }}'"
+Environment="DOCKER_HOST={{ tester.docker.url }}"
