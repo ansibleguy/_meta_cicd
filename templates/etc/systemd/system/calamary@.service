@@ -1,0 +1,15 @@
+# {{ ansible_managed }}
+# ansibleguy.cicd_tester
+
+[Unit]
+Description=Service to run an instance of calamary proxy
+
+[Service]
+Type=oneshot
+User=proxy
+Group=proxy
+ExecStart=/tmp/calamary_%i -f /tmp/calamary_%i.yml
+
+StandardOutput=journal
+StandardError=journal
+SyslogIdentifier=cicd_calamary

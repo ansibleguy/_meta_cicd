@@ -1,0 +1,5 @@
+Cmnd_Alias TESTER_CALAMARY = \
+  /bin/systemctl start calamary* ,\
+  /bin/systemctl stop calamary*
+
+tester ALL=(ALL) NOPASSWD: TESTER_CALAMARY
