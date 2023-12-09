@@ -45,4 +45,4 @@
     creates: "{{ tester.path.web }}/{{ item.file }}.svg"
   loop:
     - {label: 'LINT', file: "{{ collection_name }}.collection.lint"}
-    - {label: "TEST {{ job.value.label }}", file: "{{ collection_name }}.collection.test"}
+    - {label: "TEST {{ job.value.label | default(job.value.label_prefix + ' ?') }}", file: "{{ collection_name }}.collection.test"}

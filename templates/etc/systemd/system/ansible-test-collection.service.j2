@@ -10,7 +10,12 @@ User={{ tester.user }}
 Group={{ tester.user }}
 ExecStartPre=mkdir -p {{ tester.path.test }}
 ExecStartPre=rm -rf {{ tester.path.test }}/collection_{{ collection_name }}
-ExecStart=/bin/bash {{ tester.path.script }}/collection_test.sh '{{ collection_name }}' '{{ job.value.label }}'{% for arg in job.value.test_args %} '{{ arg }}'{% endfor %}
+{% if 'label_script' in job.value %}
+ExecStartPre=/bin/bash -c '{{ job.value.label_script }} > /tmp/collection_{{ collection_name }}.label && sleep 1'
+{% else %}
+ExecStartPre=/bin/echo -c "echo '{{ job.value.label }}' > /tmp/collection_{{ collection_name }}.label"
+{% endif %}
+ExecStart=/bin/bash -c '{{ tester.path.script }}/collection_test.sh "{{ collection_name }}" "{{ job.value.label_prefix + ' ' | default('') }}$(cat /tmp/collection_{{ collection_name }}.label)"{% for arg in job.value.test_args %} "{{ arg }}"{% endfor %}'
 
 {% if ansible_distribution_version == '10' %}
 StandardOutput=syslog

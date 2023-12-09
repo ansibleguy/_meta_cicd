@@ -35,24 +35,24 @@ function update_badge {
   cd "$PATH_BADGE"
   if [[ "$collection" == "1" ]]
   then
-    KEY_BADGE="collection_$ROLE"
+    KEY_BADGE="collection_${ROLE}"
   else
     KEY_BADGE="$ROLE"
   fi
-  rm -f "$KEY_BADGE.{{ test }}.svg"
-  anybadge --label="$LABEL" --value="$status | $(date '+%Y-%m-%d %H:%M') GMT+2" --file="$KEY_BADGE.{{ test }}" --color="${BADGE_COLORS[$status]}"
+  rm -f "${KEY_BADGE}.{{ test }}.svg"
+  anybadge --label="$LABEL" --value="${status} | $(date '+%Y-%m-%d %H:%M') GMT+2" --file="${KEY_BADGE}.{{ test }}" --color="${BADGE_COLORS[$status]}"
 }
 
-source "$PATH_VENV/bin/activate"
+source "${PATH_VENV}/bin/activate"
 collection=0
 
 if echo "$ROLE" | grep -q 'collection'
 then
   ROLE=$(echo "$ROLE" | cut -d '_' -f2)
   collection=1
-  PATH_TEST_FULL="$PATH_TEST/collections/ansible_collections/$GALAXY_NAMESPACE/$ROLE"
+  PATH_TEST_FULL="${PATH_TEST}/collections/ansible_collections/${GALAXY_NAMESPACE}/${ROLE}"
 else
-  PATH_TEST_FULL="$PATH_TEST/$GALAXY_NAMESPACE.$ROLE"
+  PATH_TEST_FULL="${PATH_TEST}/${GALAXY_NAMESPACE}.${ROLE}"
 fi
 
 if [ -n "$2" ]
@@ -70,9 +70,9 @@ rm -rf "$PATH_TEST_FULL"
 
 if [[ "$collection" == "1" ]]
 then
-  ansible-galaxy collection install "git+https://github.com/$GALAXY_NAMESPACE/collection_$ROLE" -p "$PATH_TEST/collections"
+  ansible-galaxy collection install "git+https://github.com/${GALAXY_NAMESPACE}/collection_${ROLE}" -p "${PATH_TEST}/collections"
 else
-  ansible-galaxy install --roles-path "$PATH_TEST" "$GALAXY_NAMESPACE.$ROLE"
+  ansible-galaxy install --roles-path "$PATH_TEST" "${GALAXY_NAMESPACE}.${ROLE}"
 fi
 
 cd "$PATH_TEST_FULL"

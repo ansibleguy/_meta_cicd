@@ -8,7 +8,7 @@ set -uo pipefail
 TEST="$1"
 REPO_NAME="$2"
 PATH_SCRIPT='{{ tester.path.script }}'
-TEST_SCRIPT="${PATH_SCRIPT}/$TEST.sh"
+TEST_SCRIPT="${PATH_SCRIPT}/${TEST}.sh"
 FAIL_SCRIPT="${PATH_SCRIPT}/post_exec.sh"
 
 if $TEST_SCRIPT "$REPO_NAME"

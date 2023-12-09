@@ -142,6 +142,7 @@
     - '.ssh/id_ed25519'
     - '.secret/opn.key'
     - '.secret/lha.yml'
+    - '.secret/nftables.pwd'
   tags: collections
 
 - name: CICD | Ansible Tester | Adding docker-cleanup job

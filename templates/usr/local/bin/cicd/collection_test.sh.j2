@@ -15,7 +15,7 @@ fi
 
 PATH_TEST='{{ tester.path.test }}'
 PATH_BADGE='{{ tester.path.web }}'
-PATH_LOG="$PATH_BADGE/log"
+PATH_LOG="${PATH_BADGE}/log"
 PATH_VENV='{{ tester.path.venv }}'
 HOME='{{ tester.path.home }}'
 LOG_LINES='{{ tester.log.lines }}'
@@ -25,6 +25,7 @@ LABEL="TEST $2"
 TEST_ARGS="${@:3}"
 status='RUNNING'
 LOG_FILE="${PATH_LOG}/collection_${COLLECTION}_test.log"
+LOG_FILE2="${PATH_LOG}/collection_${COLLECTION}_test_short.log"
 EXIT_CODE_FAILED='{{ tester.rc.soft_fail }}'
 exit_code=0
 
@@ -34,22 +35,33 @@ BADGE_COLORS[RUNNING]='#{{ tester.colors.run }}'
 BADGE_COLORS[PASSED]='#{{ tester.colors.ok }}'
 BADGE_COLORS[FAILED]='#{{ tester.colors.bad }}'
 BADGE_COLORS[FAILED-ENVIRONMENT]='#{{ tester.colors.bad }}'
+BADGE_COLORS[FAILED-CLEANUP]='#{{ tester.colors.bad }}'
 
 function update_badge {
   cd "$PATH_BADGE"
-  rm -f "$COLLECTION.collection.test.svg"
-  anybadge --label="$LABEL" --value="$status | $(date '+%Y-%m-%d %H:%M') GMT+2" --file="$COLLECTION.collection.test" --color="${BADGE_COLORS[$status]}"
+  rm -f "${COLLECTION}.collection.test.svg"
+  anybadge --label="$LABEL" --value="${status} | $(date '+%Y-%m-%d %H:%M') GMT+2" --file="${COLLECTION}.collection.test" --color="${BADGE_COLORS[$status]}"
 }
 
-source "$PATH_VENV/bin/activate"
+function update_logs {
+  journalctl -u "ansible-test-collection-${COLLECTION}.service" --full --no-pager -n "$LOG_LINES" > "$LOG_FILE"
+  journalctl -u "ansible-test-collection-${COLLECTION}.service" -n 10000 --no-pager --full | grep -E 'Starting Service|Finished Service|FAILED|exception|Traceback|RUNNING TESTS' > "$LOG_FILE2"
+}
+
+function set_error {
+  status="$1"
+  echo "$status"
+  exit_code="$EXIT_CODE_FAILED"
+}
+
+source "${PATH_VENV}/bin/activate"
 
 update_badge
-rm -f "$LOG_FILE"
 
 # preparations for tests
 cd "$PATH_TEST"
-git clone "https://github.com/ansibleguy/collection_$COLLECTION.git"
-cd "collection_$COLLECTION"
+git clone "https://github.com/ansibleguy/collection_${COLLECTION}.git"
+cd "collection_${COLLECTION}"
 
 set +e  # soft-handling of failures
 chmod +x ./scripts/test.sh
@@ -57,30 +69,27 @@ chmod +x ./scripts/test_cleanup.sh
 
 if ! ./scripts/test_cleanup.sh $TEST_ARGS "$PATH_VENV"
 then
-  echo 'PRE-CLEANUP FAILED'
-  exit_code="$EXIT_CODE_FAILED"
+  set_error 'FAILED-CLEANUP'
 else
   echo 'PRE-CLEANUP SUCCESSFUL'
 fi
 
 if ! ./scripts/test.sh $TEST_ARGS "$PATH_VENV"
 then
-  status='FAILED'
-  journalctl -u "ansible-test-collection-$COLLECTION.service" --full --no-pager -n "$LOG_LINES" > "$LOG_FILE"
-  exit_code="$EXIT_CODE_FAILED"
+  set_error 'FAILED'
 else
   status='PASSED'
 fi
 
 if ! ./scripts/test_cleanup.sh $TEST_ARGS "$PATH_VENV"
 then
-  echo 'POST-CLEANUP FAILED'
-  exit_code="$EXIT_CODE_FAILED"
+  set_error 'FAILED-CLEANUP'
 else
   echo 'POST-CLEANUP SUCCESSFUL'
 fi
 
+update_logs
 update_badge
 cd /tmp
-rm -rf "$PATH_TEST/collection_$COLLECTION"
+rm -rf "${PATH_TEST}/collection_${COLLECTION}"
 exit "$exit_code"

@@ -39,17 +39,23 @@ BADGE_COLORS[FAILED-ENVIRONMENT]='#{{ tester.colors.bad }}'
 
 ROLE="$1"
 LOG_FILE="${PATH_LOG}/molecule_${ROLE}_test.log"
+LOG_FILE2="${PATH_LOG}/molecule_${ROLE}_test_short.log"
 
 function update_badge {
   cd "$PATH_BADGE"
   if [[ "$collection" == "1" ]]
   then
-    KEY_BADGE="collection_$ROLE"
+    KEY_BADGE="collection_${ROLE}"
   else
     KEY_BADGE="$ROLE"
   fi
-  rm -f "$KEY_BADGE.{{ test }}.svg"
-  anybadge --label="$LABEL" --value="$status | $(date '+%Y-%m-%d %H:%M') GMT+2" --file="$KEY_BADGE.{{ test }}" --color="${BADGE_COLORS[$status]}"
+  rm -f "${KEY_BADGE}.{{ test }}.svg"
+  anybadge --label="$LABEL" --value="${status} | $(date '+%Y-%m-%d %H:%M') GMT+2" --file="${KEY_BADGE}.{{ test }}" --color="${BADGE_COLORS[$status]}"
+}
+
+function update_logs {
+  journalctl -u "ansible-test-molecule-${ROLE}.service" --full --no-pager -n "$LOG_LINES" > "$LOG_FILE"
+  journalctl -u "ansible-test-molecule-${ROLE}.service" -n 10000 --full --no-pager | grep -E 'Starting Service|Finished Service|completed successful|FAILED' | grep -v 'Wait' > "$LOG_FILE2"
 }
 
 function cleanup {
@@ -63,23 +69,22 @@ function cleanup {
     cd /tmp
     rm -rf "$PATH_TEST_FULL"
   fi
-  rm -rf "$HOME/.cache/molecule/$ROLE"
+  rm -rf "$HOME/.cache/molecule/${ROLE}"
   if [ -d "$HOME/.cache/ansible-compat" ]
   then
     find "$HOME/.cache/ansible-compat" -maxdepth 0 -type d -mmin +30 -exec rm -rf {} \;
   fi
 }
 
-function log_error {
-  journalctl -u "ansible-test-molecule-$ROLE.service" --full --no-pager -n "$LOG_LINES" > "$LOG_FILE"
+function set_error {
+  status="$1"
   exit_code="$EXIT_CODE_FAILED"
 }
 
 mkdir -p "$PATH_TEST"
-source "$PATH_VENV/bin/activate"
+source "${PATH_VENV}/bin/activate"
 collection=0
 cleanup
-rm -f "$LOG_FILE"
 
 if [ -n "$2" ]
 then
@@ -96,13 +101,13 @@ if echo "$ROLE" | grep -q 'collection'
 then
   ROLE=$(echo "$ROLE" | cut -d '_' -f2)
   collection=1
-  PATH_TEST_FULL="$PATH_TEST/collections/ansible_collections/$GALAXY_NAMESPACE/$ROLE"
+  PATH_TEST_FULL="${PATH_TEST}/collections/ansible_collections/${GALAXY_NAMESPACE}/${ROLE}"
   rm -rf "$PATH_TEST_FULL"
-  ansible-galaxy collection install "git+https://github.com/$GALAXY_NAMESPACE/collection_$ROLE" -p "$PATH_TEST/collections"
+  ansible-galaxy collection install "git+https://github.com/${GALAXY_NAMESPACE}/collection_${ROLE}" -p "${PATH_TEST}/collections"
 else
-  PATH_TEST_FULL="$PATH_TEST/$GALAXY_NAMESPACE.$ROLE"
+  PATH_TEST_FULL="${PATH_TEST}/${GALAXY_NAMESPACE}.${ROLE}"
   rm -rf "$PATH_TEST_FULL"
-  ansible-galaxy install --roles-path "$PATH_TEST" "$GALAXY_NAMESPACE.$ROLE"
+  ansible-galaxy install --roles-path "$PATH_TEST" "${GALAXY_NAMESPACE}.${ROLE}"
 fi
 
 cd "$PATH_TEST_FULL"
@@ -122,24 +127,20 @@ molecule prepare
 set +e  # soft-handling of failures
 if ! molecule converge
 then
-  status='FAILED-CONVERGE'
-  log_error
+  set_error 'FAILED-CONVERGE'
 else
   if ! molecule verify
   then
-    status='FAILED-VERIFY'
-    log_error
+    set_error 'FAILED-VERIFY'
   else
     if ! molecule idempotence
     then
-      status='FAILED-IDEMPOTENCE'
-      log_error
+      set_error 'FAILED-IDEMPOTENCE'
     else
       # check-mode can be disabled
       if cat "$MOLECULE_CONFIG" | grep '  - check' -q && ! molecule check
       then
-        status='FAILED-CHECK'
-        log_error
+        set_error 'FAILED-CHECK'
       else
         status='PASSED'
       fi
@@ -147,6 +148,7 @@ else
   fi
 fi
 
+update_logs
 update_badge
 cleanup
 exit "$exit_code"

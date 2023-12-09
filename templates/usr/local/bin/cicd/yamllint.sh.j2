@@ -21,6 +21,7 @@ status='RUNNING'
 GALAXY_NAMESPACE='ansibleguy'
 EXIT_CODE_FAILED='{{ tester.rc.soft_fail }}'
 exit_code=0
+LOG_FILE="${PATH_LOG}/yamllint_${ROLE}.log"
 
 declare -A BADGE_COLORS
 BADGE_COLORS[UNKNOWN]='#{{ tester.colors.wait }}'
@@ -35,24 +36,33 @@ function update_badge {
   cd "$PATH_BADGE"
   if [[ "$collection" == "1" ]]
   then
-    KEY_BADGE="collection_$ROLE"
+    KEY_BADGE="collection_${ROLE}"
   else
     KEY_BADGE="$ROLE"
   fi
-  rm -f "$KEY_BADGE.{{ test }}.svg"
-  anybadge --label="$LABEL" --value="$status | $(date '+%Y-%m-%d %H:%M') GMT+2" --file="$KEY_BADGE.{{ test }}" --color="${BADGE_COLORS[$status]}"
+  rm -f "${KEY_BADGE}.{{ test }}.svg"
+  anybadge --label="$LABEL" --value="${status} | $(date '+%Y-%m-%d %H:%M') GMT+2" --file="${KEY_BADGE}.{{ test }}" --color="${BADGE_COLORS[$status]}"
 }
 
-source "$PATH_VENV/bin/activate"
+function update_logs {
+  journalctl -u "ansible-test-yamllint-${ROLE}.service" -n 1000 --no-pager --full | grep -Ev 'download|ansibleguy.|galaxy' > "$LOG_FILE"
+}
+
+function set_error {
+  status="$1"
+  exit_code="$EXIT_CODE_FAILED"
+}
+
+source "${PATH_VENV}/bin/activate"
 collection=0
 
 if echo "$ROLE" | grep -q 'collection'
 then
   ROLE=$(echo "$ROLE" | cut -d '_' -f2)
   collection=1
-  PATH_TEST_FULL="$PATH_TEST/collections/ansible_collections/$GALAXY_NAMESPACE/$ROLE"
+  PATH_TEST_FULL="${PATH_TEST}/collections/ansible_collections/${GALAXY_NAMESPACE}/${ROLE}"
 else
-  PATH_TEST_FULL="$PATH_TEST/$GALAXY_NAMESPACE.$ROLE"
+  PATH_TEST_FULL="${PATH_TEST}/${GALAXY_NAMESPACE}.${ROLE}"
 fi
 
 if [ -n "$2" ]
@@ -70,9 +80,9 @@ rm -rf "$PATH_TEST_FULL"
 
 if [[ "$collection" == "1" ]]
 then
-  ansible-galaxy collection install "git+https://github.com/$GALAXY_NAMESPACE/collection_$ROLE" -p "$PATH_TEST/collections"
+  ansible-galaxy collection install "git+https://github.com/${GALAXY_NAMESPACE}/collection_${ROLE}" -p "${PATH_TEST}/collections"
 else
-  ansible-galaxy install --roles-path "$PATH_TEST" "$GALAXY_NAMESPACE.$ROLE"
+  ansible-galaxy install --roles-path "$PATH_TEST" "${GALAXY_NAMESPACE}.${ROLE}"
 fi
 
 cd "$PATH_TEST_FULL"
@@ -80,12 +90,12 @@ cd "$PATH_TEST_FULL"
 set +e  # soft-handling of failures
 if ! yamllint .
 then
-  status='FAILED'
-  exit_code="$EXIT_CODE_FAILED"
+  set_error 'FAILED'
 else
   status='PASSED'
 fi
 
+journalctl -u ansible-test-yamllint-infra_nftables.service -n 1000 --no-pager --full | grep -Ev 'download|ansibleguy.|galaxy'
 update_badge
 cd /tmp
 rm -rf "$PATH_TEST_FULL"

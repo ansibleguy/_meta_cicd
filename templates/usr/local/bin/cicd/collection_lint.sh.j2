@@ -32,10 +32,10 @@ BADGE_COLORS[FAILED-ENVIRONMENT]='#{{ tester.colors.bad }}'
 function update_badge {
   cd "$PATH_BADGE"
   rm -f "$COLLECTION.collection.lint.svg"
-  anybadge --label="$LABEL" --value="$status | $(date '+%Y-%m-%d %H:%M') GMT+2" --file="$COLLECTION.collection.lint" --color="${BADGE_COLORS[$status]}"
+  anybadge --label="$LABEL" --value="${status} | $(date '+%Y-%m-%d %H:%M') GMT+2" --file="$COLLECTION.collection.lint" --color="${BADGE_COLORS[$status]}"
 }
 
-source "$PATH_VENV/bin/activate"
+source "${PATH_VENV}/bin/activate"
 
 update_badge
 
@@ -57,5 +57,5 @@ fi
 
 update_badge
 cd /tmp
-rm -rf "$PATH_TEST/collection_$COLLECTION"
+rm -rf "${PATH_TEST}/collection_$COLLECTION"
 exit "$exit_code"
