@@ -91,7 +91,7 @@ tester:
       test_args: ['tester', '/home/tester/.secret/nftables.pwd', '22', '172.17.1.56', '172.17.1.57']
 
   log:
-    lines: 300
+    lines: 1500
 
   roles:
     - 'infra_apache'

@@ -95,7 +95,7 @@ else
   status='PASSED'
 fi
 
-journalctl -u ansible-test-yamllint-infra_nftables.service -n 1000 --no-pager --full | grep -Ev 'download|ansibleguy.|galaxy'
+update_logs
 update_badge
 cd /tmp
 rm -rf "$PATH_TEST_FULL"
