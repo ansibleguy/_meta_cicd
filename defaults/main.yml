@@ -118,6 +118,7 @@ tester:
     - 'collection_linuxha'
     - 'sw_semaphore'
     - 'infra_openvpn'
+    - 'sw_ansible_webui'
     # - 'collection_systemd' => only basic linting for now..
 
   roles_absent:
