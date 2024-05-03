@@ -94,6 +94,7 @@ tester:
     lines: 1500
 
   roles:
+    - 'infra_haproxy'
     - 'infra_apache'
     - 'infra_certs'
     - 'infra_django_apache'
