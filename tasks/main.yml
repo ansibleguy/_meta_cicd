@@ -143,6 +143,7 @@
     - '.secret/opn.key'
     - '.secret/lha.yml'
     - '.secret/nftables.pwd'
+    - '.secret/geoip.key'
   tags: collections
 
 - name: CICD | Ansible Tester | Adding docker-cleanup job
