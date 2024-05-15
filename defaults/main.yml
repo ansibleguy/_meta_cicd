@@ -120,6 +120,7 @@ tester:
     - 'sw_semaphore'
     - 'infra_openvpn'
     - 'sw_ansible_webui'
+    - 'sw_graylog'
     # - 'collection_systemd' => only basic linting for now..
 
   roles_absent:
