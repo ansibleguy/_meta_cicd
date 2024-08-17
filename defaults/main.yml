@@ -122,6 +122,7 @@ tester:
     - 'sw_ansible_webui'
     - 'sw_graylog'
     - 'sw_odoo_community'
+    - 'sw_zabbix_server'
     # - 'collection_systemd' => only basic linting for now..
 
   roles_absent:
