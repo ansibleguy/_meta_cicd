@@ -123,6 +123,7 @@ tester:
     - 'sw_graylog'
     - 'sw_odoo_community'
     - 'sw_zabbix_server'
+    - 'haproxy_waf_coraza'
     # - 'collection_systemd' => only basic linting for now..
 
   roles_absent:
