@@ -40,7 +40,7 @@ BADGE_COLORS[FAILED-CLEANUP]='#{{ tester.colors.bad }}'
 function update_badge {
   cd "$PATH_BADGE"
   rm -f "${COLLECTION}.collection.test.svg"
-  anybadge --label="$LABEL" --value="${status} | $(date '+%Y-%m-%d %H:%M') GMT+2" --file="${COLLECTION}.collection.test" --color="${BADGE_COLORS[$status]}"
+  anybadge --label="$LABEL" --value="${status} | $(date '+%Y-%m-%d %H:%M') GMT+2" --file="${COLLECTION}.collection.test" --color="${BADGE_COLORS[$status]}" --overwrite
 }
 
 function update_logs {

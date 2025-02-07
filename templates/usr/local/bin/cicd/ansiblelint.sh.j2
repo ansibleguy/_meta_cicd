@@ -40,7 +40,7 @@ function update_badge {
     KEY_BADGE="$ROLE"
   fi
   rm -f "${KEY_BADGE}.{{ test }}.svg"
-  anybadge --label="$LABEL" --value="${status} | $(date '+%Y-%m-%d %H:%M') GMT+2" --file="${KEY_BADGE}.{{ test }}" --color="${BADGE_COLORS[$status]}"
+  anybadge --label="$LABEL" --value="${status} | $(date '+%Y-%m-%d %H:%M') GMT+2" --file="${KEY_BADGE}.{{ test }}" --color="${BADGE_COLORS[$status]}" --overwrite
 }
 
 source "${PATH_VENV}/bin/activate"
