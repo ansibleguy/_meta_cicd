@@ -38,7 +38,7 @@ tester:
     script: '/usr/local/bin/cicd'
     script_mgmt: '/usr/local/sbin/cicd'
 
-  python_version: '3.9'
+  python_version: '3.10'
   docker:
     url: "tcp://{{ docker_dns }}:2375"
     dns: "{{ docker_dns }}"
@@ -57,9 +57,8 @@ tester:
       'libssl-dev', 'git', 'rsync', 'jq',
     ]
     pip: [
-      'setuptools',
-      'ansible', 'molecule', 'ansible-core', 'molecule-docker',
-      'anybadge', 'jmespath',
+      'ansible', 'molecule', 'molecule-docker',
+      'anybadge', 'jmespath', 'ansible-lint',
       'yamllint', 'ansible-lint', 'pylint', 'flake8',
       # collections
       'httpx', 'xmltodict', 'passlib',
@@ -69,7 +68,7 @@ tester:
   collections:
     opnsense:
       label_prefix: 'OPNSense'
-      label_script: "source /home/tester/.secret/opn.key && curl --insecure --silent -d \"\" -k -u \"$key\":\"$secret\" https://opn-test.local/api/core/firmware/info | jq \".product_version\" | tr -d \\\\\""
+      label_script: "source /home/tester/.secret/opn.key && curl --insecure --silent -d \"\" -k -u \"$key\":\"$secret\" https://opn-test.local/api/core/firmware/info | jq -r \".product_version\""
       ip: '172.17.1.52'
       dns: 'opn-test.local'
       test_args: ['opn-test.local', '/home/tester/.secret/opn.key', '0']
