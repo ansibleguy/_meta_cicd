@@ -21,7 +21,7 @@ do
     svc=$(echo "$FILE" | cut -d '/' -f5)
     echo "Starting '$svc'"
     systemctl start "$svc" --no-block
-    journalctl -u "$svc" --no-pager -f
+    journalctl -u "$svc" --no-hostname --no-pager -f
   fi
 done
 

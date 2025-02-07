@@ -17,7 +17,7 @@ fi
 for FILE in /etc/systemd/system/ansible-test-molecule-*$1.service
 do
   svc=$(echo $FILE | cut -d '/' -f5)
-  journalctl -u "$svc" --no-pager -f
+  journalctl -u "$svc" --no-pager --no-hostname -f
 done
 
 echo ''

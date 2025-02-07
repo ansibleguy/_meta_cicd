@@ -45,7 +45,7 @@ function update_badge {
 }
 
 function update_logs {
-  journalctl -u "ansible-test-yamllint-${ROLE}.service" -n 1000 --no-pager --full | grep -Ev 'download|ansibleguy.|galaxy' > "$LOG_FILE"
+  journalctl -u "ansible-test-yamllint-${ROLE}.service" -n 1000 --no-pager --full --no-hostname | grep -Ev 'download|ansibleguy.|galaxy' > "$LOG_FILE"
 }
 
 function set_error {

@@ -19,9 +19,9 @@ for FILE in /etc/systemd/system/ansible-test-$1-*$2.service
 do
   svc=$(echo $FILE | cut -d '/' -f5)
   echo "Checking status for '$svc'"
-  journalctl -u "$svc" -n 50 --no-pager
+  journalctl -u "$svc" -n 50 --no-hostname --no-pager
   echo ''
-  echo "Command: journalctl -u "$svc" --no-pager -n 50"
+  echo "Command: journalctl -u "$svc" --no-hostname --no-pager -n 50"
 done
 
 echo ''

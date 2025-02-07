@@ -22,8 +22,8 @@ do
   systemctl start "$svc"
   echo 'Pulling status:'
   echo ''
-  journalctl -u "$svc" --no-pager -n 25
-  echo "Command: journalctl -u "$svc" --no-pager -n 25"
+  journalctl -u "$svc" --no-hostname --no-pager -n 25
+  echo "Command: journalctl -u "$svc" --no-hostname --no-pager -n 25"
 done
 
 echo ''

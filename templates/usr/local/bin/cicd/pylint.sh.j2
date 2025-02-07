@@ -47,7 +47,7 @@ function update_badge {
 }
 
 function update_logs {
-  journalctl -u "ansible-test-pylint-${ROLE}.service" -n 1000 --no-pager --full | grep -E 'Starting Service|Finished Service|pylint:' > "$LOG_FILE"
+  journalctl -u "ansible-test-pylint-${ROLE}.service" -n 1000 --no-pager --full --no-hostname | grep -E 'Starting Service|Finished Service|pylint:' > "$LOG_FILE"
 }
 
 function set_error {

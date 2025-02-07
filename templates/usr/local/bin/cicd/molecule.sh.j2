@@ -54,8 +54,8 @@ function update_badge {
 }
 
 function update_logs {
-  journalctl -u "ansible-test-molecule-${ROLE}.service" --full --no-pager -n "$LOG_LINES" > "$LOG_FILE"
-  journalctl -u "ansible-test-molecule-${ROLE}.service" -n 10000 --full --no-pager | grep -E 'Starting Service|Finished Service|completed successful|FAILED' | grep -v 'Wait' > "$LOG_FILE2"
+  journalctl -u "ansible-test-molecule-${ROLE}.service" --full --no-pager --no-hostname -n "$LOG_LINES" > "$LOG_FILE"
+  journalctl -u "ansible-test-molecule-${ROLE}.service" -n 10000 --full --no-pager --no-hostname | grep -E 'Starting Service|Finished Service|completed successful|FAILED' | grep -v 'Wait' > "$LOG_FILE2"
 }
 
 function cleanup {
