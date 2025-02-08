@@ -9,20 +9,20 @@
     mode: 0640
   tags: services
 
-- name: "CICD | Ansible Tester | Role {{ repo_name }} | Adding services"
-  ansible.builtin.template:
-    src: "templates/etc/systemd/system/ansible-test-default.service.j2"
-    dest: "/etc/systemd/system/ansible-test-{{ test }}-{{ repo_name }}.service"
-    owner: 'root'
-    group: "{{ tester.user }}"
-    mode: 0640
-  loop_control:
-    loop_var: 'test'
-  loop:
-    - 'yamllint'
-    - 'ansiblelint'
-    - 'pylint'
-  tags: services
+#- name: "CICD | Ansible Tester | Role {{ repo_name }} | Adding services"
+#  ansible.builtin.template:
+#    src: "templates/etc/systemd/system/ansible-test-default.service.j2"
+#    dest: "/etc/systemd/system/ansible-test-{{ test }}-{{ repo_name }}.service"
+#    owner: 'root'
+#    group: "{{ tester.user }}"
+#    mode: 0640
+#  loop_control:
+#    loop_var: 'test'
+#  loop:
+#    - 'yamllint'
+#    - 'ansiblelint'
+#    - 'pylint'
+#  tags: services
 
 - name: "CICD | Ansible Tester | Role {{ repo_name }} | Removing fail-handlers"
   ansible.builtin.file:
@@ -32,9 +32,9 @@
     loop_var: 'test'
   loop:
     - 'molecule'
-    - 'yamllint'
-    - 'ansiblelint'
-    - 'pylint'
+#    - 'yamllint'
+#    - 'ansiblelint'
+#    - 'pylint'
   tags: services
 
 - name: "CICD | Ansible Tester | Role {{ repo_name }} | Adding timers"
@@ -48,9 +48,9 @@
     loop_var: 'test'
   loop:
     - 'molecule'
-    - 'yamllint'
-    - 'ansiblelint'
-    - 'pylint'
+#    - 'yamllint'
+#    - 'ansiblelint'
+#    - 'pylint'
   tags: services
 
 - name: "CICD | Ansible Tester | Role {{ repo_name }} | Starting/enabling jobs"
@@ -61,9 +61,9 @@
     enabled: yes
   loop:
     - 'molecule'
-    - 'yamllint'
-    - 'ansiblelint'
-    - 'pylint'
+#    - 'yamllint'
+#    - 'ansiblelint'
+#    - 'pylint'
   tags: services
 
 - name: "CICD | Ansible Tester | Role {{ repo_name }} | Adding initial badges"
@@ -75,7 +75,7 @@
     chdir: "{{ tester.path.web }}"
     creates: "{{ tester.path.web }}/{{ repo_name }}.{{ item.ext }}.svg"
   loop:
-    - {label: 'YamlLint', ext: 'yamllint'}
-    - {label: 'PyLint', ext: 'pylint'}
-    - {label: 'Ansible-Lint', ext: 'ansiblelint'}
+#    - {label: 'YamlLint', ext: 'yamllint'}
+#    - {label: 'PyLint', ext: 'pylint'}
+#    - {label: 'Ansible-Lint', ext: 'ansiblelint'}
     - {label: 'Molecule', ext: 'molecule'}

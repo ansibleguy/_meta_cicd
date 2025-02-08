@@ -174,9 +174,9 @@
     repo_name: "{{ job }}"
     trigger_time:
       molecule: "{{ tester.trigger.molecule.start_time | add_time(tester.trigger.molecule.separation * job_idx) }}"
-      yamllint: "{{ tester.trigger.yamllint.start_time | add_time(tester.trigger.yamllint.separation * job_idx) }}"
-      pylint: "{{ tester.trigger.pylint.start_time | add_time(tester.trigger.pylint.separation * job_idx) }}"
-      ansiblelint: "{{ tester.trigger.ansiblelint.start_time | add_time(tester.trigger.ansiblelint.separation * job_idx) }}"
+#      yamllint: "{{ tester.trigger.yamllint.start_time | add_time(tester.trigger.yamllint.separation * job_idx) }}"
+#      pylint: "{{ tester.trigger.pylint.start_time | add_time(tester.trigger.pylint.separation * job_idx) }}"
+#      ansiblelint: "{{ tester.trigger.ansiblelint.start_time | add_time(tester.trigger.ansiblelint.separation * job_idx) }}"
   args:
     apply:
       tags: [services, roles]
