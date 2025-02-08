@@ -36,11 +36,12 @@ BADGE_COLORS[PASSED]='#{{ tester.colors.ok }}'
 BADGE_COLORS[FAILED]='#{{ tester.colors.bad }}'
 BADGE_COLORS[FAILED-ENVIRONMENT]='#{{ tester.colors.bad }}'
 BADGE_COLORS[FAILED-CLEANUP]='#{{ tester.colors.bad }}'
+BADGE_FILE="${COLLECTION}.collection.test.svg"
 
 function update_badge {
   cd "$PATH_BADGE"
-  rm -f "${COLLECTION}.collection.test.svg"
-  anybadge --label="$LABEL" --value="${status} | $(date '+%Y-%m-%d %H:%M') GMT+2" --file="${COLLECTION}.collection.test" --color="${BADGE_COLORS[$status]}" --overwrite
+  rm -f "$BADGE_FILE"
+  anybadge --label="$LABEL" --value="${status} | $(date '+%Y-%m-%d %H:%M') GMT+2" --file="$BADGE_FILE" --color="${BADGE_COLORS[$status]}" --overwrite
 }
 
 function update_logs {

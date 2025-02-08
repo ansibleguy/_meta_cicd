@@ -69,7 +69,7 @@
 - name: "CICD | Ansible Tester | Role {{ repo_name }} | Adding initial badges"
   ansible.builtin.shell: |
     source "{{ tester.path.venv }}/bin/activate"
-    anybadge --label="{{ item.label }}" --value="WAITING" --file="{{ repo_name }}.{{ item.ext }}" --color="#{{ tester.colors.wait }}" --overwrite
+    anybadge --label="{{ item.label }}" --value="WAITING" --file="{{ repo_name }}.{{ item.ext }}.svg" --color="#{{ tester.colors.wait }}" --overwrite
   args:
     executable: '/bin/bash'
     chdir: "{{ tester.path.web }}"

@@ -28,11 +28,12 @@ BADGE_COLORS[RUNNING]='#{{ tester.colors.run }}'
 BADGE_COLORS[PASSED]='#{{ tester.colors.ok }}'
 BADGE_COLORS[FAILED]='#{{ tester.colors.bad }}'
 BADGE_COLORS[FAILED-ENVIRONMENT]='#{{ tester.colors.bad }}'
+BADGE_FILE="$COLLECTION.collection.lint.svg"
 
 function update_badge {
   cd "$PATH_BADGE"
-  rm -f "$COLLECTION.collection.lint.svg"
-  anybadge --label="$LABEL" --value="${status} | $(date '+%Y-%m-%d %H:%M') GMT+2" --file="$COLLECTION.collection.lint" --color="${BADGE_COLORS[$status]}" --overwrite
+  rm -f "$BADGE_FILE"
+  anybadge --label="$LABEL" --value="${status} | $(date '+%Y-%m-%d %H:%M') GMT+2" --file="$BADGE_FILE" --color="${BADGE_COLORS[$status]}" --overwrite
 }
 
 source "${PATH_VENV}/bin/activate"

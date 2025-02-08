@@ -16,3 +16,11 @@ This is the very basic setup I use to test my roles and collections.
 
 ## Logs
 Errors of failed tests will be logged [in this directory](https://badges.ansibleguy.net/log/).
+
+----
+
+## API for GitHub-Workflow integration
+
+To gain transparency a CI-API will be used from GitHub-Actions to check job-stati and fetch the latest logs.
+
+The sources for that CI-API can be found here: [O-X-L/github-self-hosted-jobs-systemd](https://github.com/O-X-L/github-self-hosted-jobs-systemd)
