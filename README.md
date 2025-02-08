@@ -2,6 +2,8 @@
 
 This is the very basic setup I use to test my roles and collections.
 
+[![Lint](https://github.com/ansibleguy/_meta_cicd/actions/workflows/lint.yml/badge.svg)](https://github.com/ansibleguy/_meta_cicd/actions/workflows/lint.yml)
+
 ## Tests
 
 ### Roles

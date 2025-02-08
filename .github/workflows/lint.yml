@@ -9,7 +9,7 @@ on:
     branches: [main, stable, latest]
 
 jobs:
-  build:
+  lint:
     runs-on: ubuntu-latest
     timeout-minutes: 2
     steps:
