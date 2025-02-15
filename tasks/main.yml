@@ -60,7 +60,7 @@
   ansible.builtin.file:
     path: "{{ tester.path.venv }}"
     state: directory
-    owner: 'root'
+    owner: "{{ tester.user }}"
     group: "{{ tester.user }}"
     recurse: true
 
