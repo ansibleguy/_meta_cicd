@@ -18,7 +18,7 @@ PATH_VENV='{{ tester.path.venv }}'
 
 LABEL='YamlLint'
 status='RUNNING'
-GALAXY_NAMESPACE='ansibleguy'
+GALAXY_NAMESPACE='oxlorg'
 EXIT_CODE_FAILED='{{ tester.rc.soft_fail }}'
 exit_code=0
 LOG_FILE="${PATH_LOG}/yamllint_${ROLE}.log"
@@ -45,7 +45,7 @@ function update_badge {
 }
 
 function update_logs {
-  journalctl -u "ansible-test-yamllint-${ROLE}.service" -n 1000 --no-pager --full --no-hostname | grep -Ev 'download|ansibleguy.|galaxy' > "$LOG_FILE"
+  journalctl -u "ansible-test-yamllint-${ROLE}.service" -n 1000 --no-pager --full --no-hostname | grep -Ev 'download|ansibleguy.|oxlorg.|galaxy' > "$LOG_FILE"
 }
 
 function set_error {

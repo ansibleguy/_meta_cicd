@@ -1,5 +1,5 @@
 # {{ ansible_managed }}
-# ansibleguy.cicd_tester
+# oxlorg.oxl_cicd
 
 [Unit]
 Description=Service to run an instance of calamary proxy

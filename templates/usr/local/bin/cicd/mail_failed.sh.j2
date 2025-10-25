@@ -10,7 +10,7 @@ failed_test_count=$(echo "$failed_tests" | wc -l)
 if echo "$failed_tests" | grep -q 'ansible-test'
 then
   {
-    echo 'To: guy@ansibleguy.net'
+    echo 'To: contact+cicd@oxl.at'
     echo "Subject: Failed Tests $(date +'%Y-%m-%d')"
     echo ''
     printf "FAILED TESTS:\n\nCOUNT: %s\n\n%s\n" "$failed_test_count" "$failed_tests"
